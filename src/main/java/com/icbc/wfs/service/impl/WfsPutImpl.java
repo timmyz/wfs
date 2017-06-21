@@ -9,10 +9,8 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.icbc.dubbo.util.MurMurHash;
-import com.icbc.wfs.WfsEnv;
+import com.alibaba.dubbo.rpc.RpcContext;
 import com.icbc.wfs.WfsUtil;
-import com.icbc.wfs.service.WfsGet;
 import com.icbc.wfs.service.WfsPut;
 
 //@Service(version = "0.0.1", cluster = "forking")
@@ -21,12 +19,9 @@ public class WfsPutImpl implements WfsPut {
 
 	@Resource
 	private WfsPut wfsPut;
-	@Resource
-	private WfsGet wfsGet;
 
 	public boolean put(String path, InputStream in) {
-		String hash = MurMurHash.hashRange(path);
-		File phyFile = new File(WfsEnv.rootDir + hash.substring(0, 2) + File.separator + hash);
+		File phyFile = WfsUtil.getPhyFile(path);
 		if (!phyFile.getParentFile().exists()) {
 			if (!phyFile.getParentFile().mkdirs()) {
 				return false;
@@ -55,17 +50,39 @@ public class WfsPutImpl implements WfsPut {
 			}
 		}
 
-		if (!WfsUtil.ROOT.equals(WfsUtil.getParent(path))) {
-			if (!wfsPut.put(path)) {
-				return false;
-			}
-		}
-
 		return true;
 	}
 
-	public boolean put(String path) {
-		// TODO modify virtual directory
+	public boolean del(String path) {
+		File phyFile = WfsUtil.getPhyFile(path);
+		if (phyFile.exists()) {
+			return phyFile.delete();
+		}
+		return true;
+	}
+
+	public boolean put0(String path) {
+		String directory = WfsUtil.getParent(path);
+		RpcContext.getContext().setAttachment("routeKey", directory);
+		String fileName = WfsUtil.getFileName(path);
+		return wfsPut.put(directory, fileName);
+	}
+
+	public boolean put(String directory, String fileName) {
+		File phyFile = WfsUtil.getPhyFile(directory);
+		if (phyFile.exists()) {
+			// TODO modify virtual directory add fileName when not exist
+			return true;
+		} else if (!WfsUtil.ROOT.equals(directory)) {
+			return put0(WfsUtil.getParent(directory));
+		} else {
+			// TODO first file make file WfsUtil.ROOT hash with fileName
+			return true;
+		}
+	}
+
+	public boolean del(String directory, String fileName) {
+		// TODO modify virtual directory del fileName when exist
 		return true;
 	}
 
