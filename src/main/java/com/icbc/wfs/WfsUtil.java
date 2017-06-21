@@ -5,7 +5,7 @@ import java.io.File;
 import com.icbc.dubbo.util.MurMurHash;
 
 public class WfsUtil {
-	public static final String PATH_SEPARATOR = File.separator;
+	public static final String PATH_SEPARATOR = "/";
 	public static final String ROOT = PATH_SEPARATOR;
 	
 
