@@ -7,6 +7,12 @@
 	<name>${project.artifactId}</name>
 
 	<packaging>war</packaging>
+	
+	<scm>
+		<connection>scm:git:https://github.com/timmyz/wfs.git</connection>
+		<url>scm:git:https://github.com/timmyz/wfs.git</url>
+		<developerConnection>scm:git:https://github.com/timmyz/wfs.git</developerConnection>
+	</scm>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
