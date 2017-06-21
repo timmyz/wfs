@@ -1,6 +1,9 @@
 package com.icbc.wfs.service.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -88,23 +91,33 @@ public class WfsIOImpl implements WfsIO {
 	public List<String> list(String path) {
 
 		List<String> list = new ArrayList<String>();
+
 		try {
-			
+
 			RpcContext.getContext().setAttachment("routeKey", path);
-			InputStream in = wfsGet.get(path);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			
+			File phyFile = WfsUtil.getPhyFile(path);
 
-			String line = null;
+			FileReader reader = null;
+			BufferedReader bReader = null;
 
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+			if (phyFile.exists()) {
+				reader = new FileReader(phyFile);
+				bReader = new BufferedReader(reader);
+
+				String line = null;
+
+				while ((line = bReader.readLine()) != null) {
+					list.add(line);
+				}
+
+				bReader.close();
+				reader.close();
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return list;
 	}
-
 }
