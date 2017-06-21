@@ -1,6 +1,9 @@
 package com.icbc.wfs.service.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,11 +62,11 @@ public class WfsIOImpl implements WfsIO {
 
 	@Override
 	public boolean del(String path) {
-		if(path.endsWith(WfsUtil.PATH_SEPARATOR)){
-			//can not delete directory
+		if (path.endsWith(WfsUtil.PATH_SEPARATOR)) {
+			// can not delete directory
 			return false;
 		}
-		
+
 		RpcContext.getContext().setAttachment("routeKey", path);
 
 		String directory = WfsUtil.getParent(path);
@@ -83,13 +86,24 @@ public class WfsIOImpl implements WfsIO {
 
 	@Override
 	public List<String> list(String path) {
-		RpcContext.getContext().setAttachment("routeKey", path);
-		// InputStream in = wfsGet.get(path);
-		List<String> list = new ArrayList<String>();
 
-		/*
-		 * readline list.add(xxx)
-		 */
+		List<String> list = new ArrayList<String>();
+		try {
+			
+			RpcContext.getContext().setAttachment("routeKey", path);
+			InputStream in = wfsGet.get(path);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+			String line = null;
+
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return list;
 	}
 

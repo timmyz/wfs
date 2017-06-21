@@ -5,8 +5,9 @@ import java.io.File;
 import com.icbc.dubbo.util.MurMurHash;
 
 public class WfsUtil {
-	public static final String PATH_SEPARATOR = "/";
+	public static final String PATH_SEPARATOR = File.pathSeparator;
 	public static final String ROOT = PATH_SEPARATOR;
+	
 
 	public static String getFileName(String path) {
 		if (ROOT.equals(path)) {
