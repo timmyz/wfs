@@ -19,11 +19,9 @@ public class WfsGetImpl implements WfsGet {
 
 	public static void main(String[] args) {
 
-		List<File> fileList = WfsGetImpl.getFileListRcrsv("/Users/Bruce/Downloads");
-
-		for (File file : fileList) {
-
-			System.out.println(file.getPath());
+		List<String> fileList = WfsGetImpl.getFileListRcrsv("/Users/Bruce/Downloads/tmp");
+		for (String str : fileList) {
+			System.out.println(str);
 		}
 	}
 
@@ -65,28 +63,40 @@ public class WfsGetImpl implements WfsGet {
 	/*
 	 * 递归获取目录下所有文件及文件夹
 	 */
-	public static List<File> getFileListRcrsv(String path) {
+	public static List<String> getFileListRcrsv(String path) {
 
 		File file = new File(path);
-
-		List<File> fileList = new LinkedList<File>();
-
+		List<String> fileList = new LinkedList<String>();
 		if (file.exists()) {
-			if (file.isFile()) {
-				fileList.add(file);
-				return fileList;
-			} else if (file.isDirectory()) {
+			if (file.isDirectory()) {
 				File[] fileArr = file.listFiles();
-				for (int i = 0; i < fileArr.length; i++) {
-					File fileOne = fileArr[i];
-					fileList.addAll(getFileListRcrsv(fileOne.getPath()));
+				if (fileArr == null) {
+					return fileList;
 				}
-			}
+				for (int i = 0; i < fileArr.length; i++) {
 
+					File fileOne = fileArr[i];
+
+					if (fileOne.isFile()) {
+						String str = "0";
+						if (fileOne.length() > 0) {
+							str = "1";
+						}
+						fileList.add(str + ":" + fileOne.getPath());
+					} else if (fileOne.isDirectory()) {
+						fileList.add("2:" + fileOne.getPath());
+						fileList.addAll(getFileListRcrsv(fileOne.getPath()));
+						
+					}
+				}
+				return fileList;
+			} else if (file.isFile()) {
+				fileList.add(file.getPath());
+				return fileList;
+			}
 		} else {
 			return null;
 		}
-
 		return fileList;
 	}
 }
