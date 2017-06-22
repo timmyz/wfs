@@ -18,10 +18,12 @@
 	
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
-	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" cluster="forking" group="0-8-A" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" group="0-8-A" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" version="0.0.1" group="0-8-A" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" version="0.0.1" cluster="forking" group="0-8-A" />
 	<dubbo:consumer timeout="300000" check="false"/>
 	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" version="0.0.1" group="*" scope="remote" />
 	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" version="0.0.1" group="*" scope="remote" />
+	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" version="0.0.1" group="*" scope="remote" />
 	
 </beans>
