@@ -1,16 +1,9 @@
 package com.icbc.wfs.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
-
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
@@ -97,32 +90,34 @@ public class WfsIOImpl implements WfsIO {
 	}
 
 	/**
-	 * 读取虚拟目录
+	 * IO层读取虚拟目录
 	 */
 	@Override
 	public List<String> list(String path) {
 
 		RpcContext.getContext().setAttachment("routeKey", path);
-		List<String> list = new ArrayList<String>();
-
-		try {
-
-			InputStreamReader streamReader = new InputStreamReader(wfsGet.get(path));
-			BufferedReader bufferedReader = new BufferedReader(streamReader);
-
-			String line = null;
-
-			while ((line = bufferedReader.readLine()) != null) {
-				list.add(line);
-			}
-
-			streamReader.close();
-			bufferedReader.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		List<String> list = wfsGet.getList(path);
 		return list;
+
+		// 更换实现方法，这个作废
+		// try {
+		//
+		// InputStreamReader streamReader = new
+		// InputStreamReader(wfsGet.get(path));
+		// BufferedReader bufferedReader = new BufferedReader(streamReader);
+		//
+		// String line = null;
+		//
+		// while ((line = bufferedReader.readLine()) != null) {
+		// list.add(line);
+		// }
+		//
+		// streamReader.close();
+		// bufferedReader.close();
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+
 	}
 }
