@@ -12,7 +12,7 @@
 	<!-- dubbo:annotation package="com.icbc.wfs" / -->
 	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfs" />
-	<dubbo:registry protocol="zookeeper"  address="DELL:2181" />
+	<dubbo:registry protocol="zookeeper"  address="localhost:2181" />
 	<dubbo:protocol name="hessian" port="8080" server="servlet" />
 	<dubbo:provider timeout="300000" />
 	
