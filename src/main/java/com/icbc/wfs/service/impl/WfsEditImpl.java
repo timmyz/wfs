@@ -41,11 +41,16 @@ public class WfsEditImpl implements WfsEdit {
 		return wfsEdit.put(directory, fileName);
 	}
 
+	
+	/*
+	 * 创建虚拟目录
+	 */
 	@Override
 	public boolean put(String dir, String fileName) {
 
 		try {
 
+			//创建虚拟文件夹
 			File vFolder = WfsUtil.getPhyFile(dir);
 			if (!vFolder.exists()) {
 				vFolder.mkdirs();
