@@ -42,27 +42,34 @@ public class WfsEditImpl implements WfsEdit {
 	}
 
 	@Override
-	public boolean put(String directory, String fileName) {
-		
+	public boolean put(String dir, String fileName) {
+
 		try {
 
-			File vFolder = WfsUtil.getPhyFile(directory);
+			File vFolder = WfsUtil.getPhyFile(dir);
 			if (!vFolder.exists()) {
 				vFolder.mkdirs();
 			}
 
 			// 创建假文件，HASH路径+真文件名
-			File vFile = new File(WfsUtil.getPhyFilePath(directory) + fileName);
+			File vFile = new File(WfsUtil.getPhyFilePath(dir) + fileName);
 
 			if (!vFile.exists()) {
 				vFile.createNewFile();
 			}
 
 			// 如果虚拟路径不等于根路径，则创建父路
-			if (!WfsUtil.ROOT.equals(directory)) {
-				return put0(WfsUtil.getParent(directory));
+			if (!WfsUtil.ROOT.equals(dir)) {
+
+				String prntDir = WfsUtil.getParent(dir);
+				String grndPrntDir = WfsUtil.getParent(prntDir);
+				String prntFolder = WfsUtil.getFileName(prntDir);
+				
+				//按照父目录，调用
+				RpcContext.getContext().setAttachment("routeKey", prntDir);
+				return wfsEdit.put(grndPrntDir, prntFolder);
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
