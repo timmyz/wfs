@@ -37,9 +37,13 @@ public class WfsUtil {
 			return path.substring(0, sub);
 		}
 	}
+	
+	public static String getPhyFilePath(String path) {
+		String hash = MurMurHash.hashRange(path);
+		return WfsEnv.rootDir + hash.substring(0, 2) + File.separator + hash;
+	}
 
 	public static File getPhyFile(String path) {
-		String hash = MurMurHash.hashRange(path);
-		return new File(WfsEnv.rootDir + hash.substring(0, 2) + File.separator + hash);
+		return new File(getPhyFilePath(path));
 	}
 }

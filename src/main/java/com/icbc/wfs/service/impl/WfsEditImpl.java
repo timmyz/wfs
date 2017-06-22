@@ -25,7 +25,7 @@ public class WfsEditImpl implements WfsEdit {
 	@Resource
 	private WfsEdit wfsEdit;
 
-
+	@Override
 	public boolean del(String path) {
 		File phyFile = WfsUtil.getPhyFile(path);
 		if (phyFile.exists()) {
@@ -41,19 +41,36 @@ public class WfsEditImpl implements WfsEdit {
 		return wfsEdit.put(directory, fileName);
 	}
 
+	@Override
 	public boolean put(String directory, String fileName) {
-		File phyFile = WfsUtil.getPhyFile(directory);
-		if (phyFile.exists()) {
-			// TODO modify virtual directory add fileName when not exist
-			return true;
-		} else if (!WfsUtil.ROOT.equals(directory)) {
-			return put0(WfsUtil.getParent(directory));
-		} else {
-			// TODO first file make file WfsUtil.ROOT hash with fileName
-			return true;
+		
+		try {
+
+			File vFolder = WfsUtil.getPhyFile(directory);
+			if (!vFolder.exists()) {
+				vFolder.mkdirs();
+			}
+
+			// 创建假文件，HASH路径+真文件名
+			File vFile = new File(WfsUtil.getPhyFilePath(directory) + fileName);
+
+			if (!vFile.exists()) {
+				vFile.createNewFile();
+			}
+
+			// 如果虚拟路径不等于根路径，则创建父路
+			if (!WfsUtil.ROOT.equals(directory)) {
+				return put0(WfsUtil.getParent(directory));
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		return true;
 	}
 
+	@Override
 	public boolean del(String directory, String fileName) {
 		// TODO modify virtual directory del fileName when exist
 
@@ -64,8 +81,7 @@ public class WfsEditImpl implements WfsEdit {
 		 * 最后目录都改成功后，再去调删文件的服务，广播出去删目标文件，至于成不成功就不关心了；
 		 * 
 		 * TODO: 临提交前又想了下，似乎我这里不应该再去做删文件的事情了，应该是删文件的时候，
-		 * 发现如果自己的物理机下有文件，先来调我这个服务去改目录，然后再删本机文件，这样似乎比较顺。
-		 * 先记着，明天讨论下，睡觉
+		 * 发现如果自己的物理机下有文件，先来调我这个服务去改目录，然后再删本机文件，这样似乎比较顺。 先记着，明天讨论下，睡觉
 		 * 
 		 */
 		File dirPhyFile = WfsUtil.getPhyFile(directory);
@@ -114,8 +130,9 @@ public class WfsEditImpl implements WfsEdit {
 			}
 			tmpDirFile.renameTo(dirPhyFile);
 
-			//String fileFullPath = directory + WfsUtil.PATH_SEPARATOR + fileName;
-			return true;//wfsIO.del(fileFullPath); 这里只负责动目录，删文件是IOImpl里做的
+			// String fileFullPath = directory + WfsUtil.PATH_SEPARATOR +
+			// fileName;
+			return true;// wfsIO.del(fileFullPath); 这里只负责动目录，删文件是IOImpl里做的
 			// 这里有点疑问，forking执行是每台都会做一遍的，有文件的会true，没文件的会false，那到底返回true还是false？
 		} else {
 			return false;
