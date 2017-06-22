@@ -17,6 +17,16 @@ import com.icbc.wfs.service.WfsGet;
 @Service("wfsGetImpl")
 public class WfsGetImpl implements WfsGet {
 
+	public static void main(String[] args) {
+
+		List<File> fileList = WfsGetImpl.getFileListRcrsv("/Users/Bruce/Downloads");
+
+		for (File file : fileList) {
+
+			System.out.println(file.getPath());
+		}
+	}
+
 	@Override
 	public InputStream get(String path) {
 		try {
@@ -50,5 +60,33 @@ public class WfsGetImpl implements WfsGet {
 		}
 
 		return null;
+	}
+
+	/*
+	 * 递归获取目录下所有文件及文件夹
+	 */
+	public static List<File> getFileListRcrsv(String path) {
+
+		File file = new File(path);
+
+		List<File> fileList = new LinkedList<File>();
+
+		if (file.exists()) {
+			if (file.isFile()) {
+				fileList.add(file);
+				return fileList;
+			} else if (file.isDirectory()) {
+				File[] fileArr = file.listFiles();
+				for (int i = 0; i < fileArr.length; i++) {
+					File fileOne = fileArr[i];
+					fileList.addAll(getFileListRcrsv(fileOne.getPath()));
+				}
+			}
+
+		} else {
+			return null;
+		}
+
+		return fileList;
 	}
 }
