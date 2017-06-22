@@ -2,11 +2,9 @@ package com.icbc.wfs.service.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.icbc.wfs.WfsUtil;
+import com.icbc.wfs.service.WfsEdit;
 import com.icbc.wfs.service.WfsGet;
 import com.icbc.wfs.service.WfsIO;
 import com.icbc.wfs.service.WfsPut;
@@ -25,12 +24,14 @@ import com.icbc.wfs.service.WfsPut;
 public class WfsIOImpl implements WfsIO {
 
 	@Resource
-	private WfsPutImpl wfsPutImpl;
+	private WfsEditImpl wfsEditImpl;
 
 	@Resource
 	private WfsPut wfsPut;
 	@Resource
 	private WfsGet wfsGet;
+	@Resource
+	private WfsEdit wfsEdit;
 
 	@Override
 	public boolean put(String path, InputStream in) {
@@ -39,8 +40,8 @@ public class WfsIOImpl implements WfsIO {
 			return false;
 		}
 
-		if (!wfsPutImpl.put0(WfsUtil.getParent(path))) {
-			wfsPut.del(path);
+		if (!wfsEditImpl.put0(WfsUtil.getParent(path))) {
+			wfsEdit.del(path);
 			return false;
 		}
 		return true;
@@ -75,12 +76,12 @@ public class WfsIOImpl implements WfsIO {
 		String directory = WfsUtil.getParent(path);
 		RpcContext.getContext().setAttachment("routeKey", directory);
 		String fileName = WfsUtil.getFileName(path);
-		if (!wfsPut.del(directory, fileName)) {
+		if (!wfsEdit.del(directory, fileName)) {
 			return false;
 		}
 
 		RpcContext.getContext().setAttachment("routeKey", path);
-		if (!wfsPut.del(path)) {
+		if (!wfsEdit.del(path)) {
 			return false;
 		}
 
