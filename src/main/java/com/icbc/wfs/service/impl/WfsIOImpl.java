@@ -2,7 +2,6 @@ package com.icbc.wfs.service.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +31,17 @@ public class WfsIOImpl implements WfsIO {
 	@Resource
 	private WfsGet wfsGet;
 
+	/**
+	 * 文件储存
+	 */
 	@Override
 	public boolean put(String path, InputStream in) {
+
+		/*
+		 * 1. 请求应该为目录所在服务器，先读取写入目录文件 2.
+		 * 
+		 */
+
 		RpcContext.getContext().setAttachment("routeKey", path);
 		if (!wfsPut.put(path, in)) {
 			return false;
@@ -87,37 +95,33 @@ public class WfsIOImpl implements WfsIO {
 		return true;
 	}
 
+	/**
+	 * 读取虚拟目录
+	 */
 	@Override
 	public List<String> list(String path) {
 
+		RpcContext.getContext().setAttachment("routeKey", path);
 		List<String> list = new ArrayList<String>();
 
 		try {
 
-			RpcContext.getContext().setAttachment("routeKey", path);
-			
-			File phyFile = WfsUtil.getPhyFile(path);
+			InputStreamReader streamReader = new InputStreamReader(wfsGet.get(path));
+			BufferedReader bufferedReader = new BufferedReader(streamReader);
 
-			FileReader reader = null;
-			BufferedReader bReader = null;
+			String line = null;
 
-			if (phyFile.exists()) {
-				reader = new FileReader(phyFile);
-				bReader = new BufferedReader(reader);
-
-				String line = null;
-
-				while ((line = bReader.readLine()) != null) {
-					list.add(line);
-				}
-
-				bReader.close();
-				reader.close();
+			while ((line = bufferedReader.readLine()) != null) {
+				list.add(line);
 			}
+
+			streamReader.close();
+			bufferedReader.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		return list;
 	}
 }
