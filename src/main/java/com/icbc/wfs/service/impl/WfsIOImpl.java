@@ -42,7 +42,7 @@ public class WfsIOImpl implements WfsIO {
 			return false;
 		}
 
-		if (!wfsEditImpl.put0(WfsUtil.getParent(path))) {
+		if (!wfsEditImpl.put(WfsUtil.getParent(path), WfsUtil.getFileName(path))) {
 			wfsEdit.del(path);
 			return false;
 		}
