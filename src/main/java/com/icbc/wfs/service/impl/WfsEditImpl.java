@@ -66,29 +66,23 @@ public class WfsEditImpl implements WfsEdit {
                 vFile.createNewFile();
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+		} catch (IOException e) {
+			logger.error(WfsEditImpl.class.getName() + "->put", e);
+			return false;
+		}
 
         return true;
     }
 
-    @Override
-    public boolean del(String directory, String fileName) {
-        File dirPhyFile = WfsUtil.getPhyFile(directory);
-        if (dirPhyFile.exists() && dirPhyFile.isDirectory()) {
-            for (File file : dirPhyFile.listFiles()) {
-                if (file.getName().equals(fileName)) {
-                    while (file.exists()) {
-                        file.delete();
-                    }
-                    return true;
-                }
-            }
-            logger.debug("no file matches the target filename in this directory");
-        }
-        return false;
-    }
+	@Override
+	public boolean del(String directory, String fileName) {
+		File dirPhyFile = WfsUtil.getPhyFile(directory);
+		if (dirPhyFile.exists() && dirPhyFile.isDirectory()) {
+			File targetFile = new File(dirPhyFile.getAbsolutePath() + File.separator + fileName);
+			WfsUtil.delete(targetFile);
+			return true;
+		}
+		return false;
+	}
 
 }
