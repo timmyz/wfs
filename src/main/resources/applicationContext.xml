@@ -17,7 +17,7 @@
 
 	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${dubbo.registry.address}" />
 	<dubbo:protocol name="hessian" port="${dubbo.protocol.port}" server="servlet" />
-	<dubbo:provider timeout="${dubbo.provider.timeout}" />
+	<dubbo:provider timeout="${dubbo.provider.timeout}" delay="-1" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
 	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" group="${dubbo.service.group}" />

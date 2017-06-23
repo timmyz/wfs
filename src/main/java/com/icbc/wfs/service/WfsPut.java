@@ -6,5 +6,5 @@ import com.icbc.dubbo.router.WfsRouterFlag;
 
 @WfsRouterFlag
 public interface WfsPut {
-    boolean put(String path, InputStream in);
+    boolean put(String path, String flag, InputStream in);
 }

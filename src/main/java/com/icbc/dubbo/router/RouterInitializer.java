@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextStartedEvent;
 
@@ -13,8 +15,12 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.container.spring.SpringContainer;
-import com.icbc.dubbo.util.MurMurHash;
 import com.icbc.dubbo.zk.ZKRegistryClient;
+import com.icbc.wfs.service.WfsEdit;
+import com.icbc.wfs.service.WfsGet;
+import com.icbc.wfs.service.WfsIO;
+import com.icbc.wfs.service.WfsPut;
+import com.icbc.wfs.service.impl.WfsEditImpl;
 
 /**
  * 路由初始化
