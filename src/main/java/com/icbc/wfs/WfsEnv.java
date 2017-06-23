@@ -8,15 +8,23 @@ public class WfsEnv {
 	public static final String GROUP_FLAG = getGroupFlag();
 
 	private static String getRootDir() {
-		return (String) PropertyConfigurer.getContextProperty("rootDir");
+		String rootDir = System.getProperty("rootDir");
+		if (rootDir == null) {
+			rootDir = (String) PropertyConfigurer.getContextProperty("rootDir");
+		}
+		return rootDir;
 	}
 
 	private static String getGroup() {
-		return (String) PropertyConfigurer.getContextProperty("dubbo.service.group");
+		String group = System.getProperty("dubbo.service.group");
+		if (group == null) {
+			group = (String) PropertyConfigurer.getContextProperty("dubbo.service.group");
+		}
+		return group;
 	}
 
 	private static String getGroupFlag() {
-		String group = (String) PropertyConfigurer.getContextProperty("dubbo.service.group");
+		String group = getGroup();
 		return group.substring(group.lastIndexOf("-") + 1);
 	}
 
