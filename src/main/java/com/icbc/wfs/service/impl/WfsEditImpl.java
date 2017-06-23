@@ -52,9 +52,11 @@ public class WfsEditImpl implements WfsEdit {
 
 			// 创建假文件，HASH路径+真文件名
 			File vFile = new File(WfsUtil.getPhyFilePath(dir) + fileName);
-
+			
 			if (!vFile.exists()) {
 				vFile.createNewFile();
+			} else {
+				return true;
 			}
 
 			// 如果虚拟路径不等于根路径，则创建父路
