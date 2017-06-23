@@ -10,22 +10,21 @@
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <context:property-placeholder location="classpath:application.properties" />
-	<!-- dubbo:annotation package="com.icbc.wfs" / -->
 	
 	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfs" />
-	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${dubbo.registry.address}" />
-	<dubbo:protocol name="hessian" port="${dubbo.protocol.port}" server="servlet" />
-	<dubbo:provider timeout="${dubbo.provider.timeout}" delay="-1" />
+	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${zkaddress}" />
+	<dubbo:protocol name="hessian" server="servlet" />
+	<dubbo:provider delay="-1" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
-	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" group="${dubbo.service.group}" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" group="${dubbo.service.group}" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" cluster="forking" group="${dubbo.service.group}" />
-	<dubbo:consumer timeout="300000" check="false"/>
+	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" group="${group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" group="${group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" group="${group}" />
+	<dubbo:consumer check="false"/>
 	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" group="*" scope="remote" />
 	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" group="*" scope="remote" />
-	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" group="*" scope="remote" />
+	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" group="*" scope="remote" merger="boolean" />
 	 
 	 <bean id="springContextHolder" class="com.icbc.dubbo.util.SpringContextHolder"></bean>
 	<bean id="propertyConfigurer" class="com.icbc.dubbo.util.PropertyConfigurer">

@@ -47,15 +47,18 @@ public class WfsUtil {
 		return new File(getPhyFilePath(path));
 	}
 
-	public static void delete(File targetFile) {
+	public static boolean delete(File targetFile) {
 		if (targetFile.isDirectory()) {
 			for (File file : targetFile.listFiles()) {
-				delete(file);
+				if (!delete(file)) {
+					return false;
+				}
 			}
 		} else {
 			while (targetFile.exists()) {
-				targetFile.delete();
+				return targetFile.delete();
 			}
 		}
+		return true;
 	}
 }

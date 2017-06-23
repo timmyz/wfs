@@ -16,9 +16,9 @@ public class WfsEnv {
 	}
 
 	private static String getGroup() {
-		String group = System.getProperty("dubbo.service.group");
+		String group = System.getProperty("group");
 		if (group == null) {
-			group = (String) PropertyConfigurer.getContextProperty("dubbo.service.group");
+			group = (String) PropertyConfigurer.getContextProperty("group");
 		}
 		return group;
 	}
