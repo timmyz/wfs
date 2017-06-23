@@ -33,7 +33,7 @@ public class WfsUtil {
 				sub = path.lastIndexOf(PATH_SEPARATOR);
 			}
 
-			return path.substring(0, sub);
+			return path.substring(0, sub+1);
 		}
 	}
 
