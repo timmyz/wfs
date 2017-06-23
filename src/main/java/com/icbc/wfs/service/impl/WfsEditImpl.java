@@ -50,7 +50,7 @@ public class WfsEditImpl implements WfsEdit {
 
 				// 如果虚拟路径不等于根路径，则递归创建上级目录
 				if (!WfsUtil.ROOT.equals(dir)) {
-					if (put0(dir)) {
+					if (!put0(dir)) {
 						return false;
 					}
 				}
