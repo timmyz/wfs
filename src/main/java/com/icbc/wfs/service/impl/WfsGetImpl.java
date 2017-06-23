@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcException;
+import com.icbc.wfs.WfsEnv;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsGet;
 
@@ -74,11 +75,12 @@ public class WfsGetImpl implements WfsGet {
 						if (fileOne.length() > 0) {
 							str = "1";
 						}
-						fileList.add(str + ":" + fileOne.getPath());
+						fileList.add(str + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
+
 					} else if (fileOne.isDirectory()) {
-						fileList.add("2:" + fileOne.getPath());
+						fileList.add("2:" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
 						fileList.addAll(getFileListRcrsv(fileOne.getPath()));
-						
+
 					}
 				}
 				return fileList;
