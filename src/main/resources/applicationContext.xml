@@ -14,19 +14,18 @@
 	
 	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfs" />
-
 	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${dubbo.registry.address}" />
 	<dubbo:protocol name="hessian" port="${dubbo.protocol.port}" server="servlet" />
 	<dubbo:provider timeout="${dubbo.provider.timeout}" delay="-1" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
-	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" group="${dubbo.service.group}" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" version="0.0.1" group="${dubbo.service.group}" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" version="0.0.1" cluster="forking" group="${dubbo.service.group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" group="${dubbo.service.group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" group="${dubbo.service.group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" cluster="forking" group="${dubbo.service.group}" />
 	<dubbo:consumer timeout="300000" check="false"/>
-	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" version="0.0.1" group="*" scope="remote" />
-	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" version="0.0.1" group="*" scope="remote" />
-	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" version="0.0.1" group="*" scope="remote" />
+	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" group="*" scope="remote" />
+	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" group="*" scope="remote" />
+	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" group="*" scope="remote" />
 	 
 	 <bean id="springContextHolder" class="com.icbc.dubbo.util.SpringContextHolder"></bean>
 	<bean id="propertyConfigurer" class="com.icbc.dubbo.util.PropertyConfigurer">

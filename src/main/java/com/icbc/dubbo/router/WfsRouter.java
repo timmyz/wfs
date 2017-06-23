@@ -41,6 +41,9 @@ public class WfsRouter implements Router {
         if (null == routeField) {
             return invokers;
         }
+        if (null == routeFlag) {
+            routeFlag = "";
+        }
         List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField), routeFlag);
         return result;
     }
@@ -55,7 +58,7 @@ public class WfsRouter implements Router {
                 String group[] = invoker.getUrl().getParameter("group").split("-");
                 int l = group.length;
                 char flag = group[--l].charAt(0);
-                if (minFlag < flag || null != routeFlag && 0 < routeFlag.indexOf(flag)) {
+                if (minFlag < flag || 0 <= routeFlag.indexOf(flag)) {
                     continue;
                 }
                 while (1 < l) {

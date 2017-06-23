@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 
 import javax.annotation.Resource;
 
@@ -67,6 +68,12 @@ public class WfsPutImpl implements WfsPut {
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
         flag = flag.concat(WfsEnv.GROUP_FLAG);
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
-        return wfsPut.put(path, flag, in);
+        try {
+            return wfsPut.put(path, flag, in);
+        } catch (NoSuchElementException e) {
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

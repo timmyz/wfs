@@ -23,7 +23,8 @@ public class MurMurHash {
 
     public static boolean withInRange(String[] group, long hashValue, String routeFlag) {
         int l = group.length;
-        if (null != routeFlag && !routeFlag.contains(group[--l])) {
+        String flag = group[--l];
+        if (null != routeFlag && !routeFlag.contains(flag)) {
             return false;
         }
         while (1 < l) {

@@ -24,9 +24,6 @@ import com.icbc.dubbo.util.MurMurHash;
 public class BusiRouter implements Router {
     public static final String ROUTE_KEY = "routeKey";
     public static final String ROUTE_FLAG = "routeFlag";
-    public static final String FLAG_DEFAULT = "A";
-    public static final String FLAG_QUERY_ONLY = "B";
-    public static final String FLAG_ALL = "AB";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BusiRouter.class);
 
@@ -44,8 +41,7 @@ public class BusiRouter implements Router {
         if (null == routeField) {
             return invokers;
         }
-        List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField),
-                null == routeFlag ? FLAG_DEFAULT : routeFlag);
+        List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField), routeFlag);
         if (result.isEmpty()) {
             RpcException e = new RpcException("Not available.Service: " + url);
             LOGGER.error(e);

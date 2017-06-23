@@ -17,14 +17,6 @@ import com.icbc.wfs.service.WfsGet;
 @Service("wfsGetImpl")
 public class WfsGetImpl implements WfsGet {
 
-	public static void main(String[] args) {
-
-		List<String> fileList = WfsGetImpl.getFileListRcrsv("/Users/Bruce/Downloads/tmp");
-		for (String str : fileList) {
-			System.out.println(str);
-		}
-	}
-
 	@Override
 	public InputStream get(String path) {
 		try {
