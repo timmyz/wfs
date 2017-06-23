@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
+import com.icbc.dubbo.router.WfsRouter;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
 
@@ -31,7 +32,7 @@ public class WfsEditImpl implements WfsEdit {
 
 	public boolean put0(String path) {
 		String directory = WfsUtil.getParent(path);
-		RpcContext.getContext().setAttachment("routeKey", directory);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
 		String fileName = WfsUtil.getFileName(path);
 		return wfsEdit.put(directory, fileName);
 	}
@@ -67,7 +68,7 @@ public class WfsEditImpl implements WfsEdit {
 				String prntFolder = WfsUtil.getFileName(prntDir);
 
 				// 按照父目录，调用
-				RpcContext.getContext().setAttachment("routeKey", prntDir);
+				RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, prntDir);
 				return wfsEdit.put(grndPrntDir, prntFolder);
 			}
 

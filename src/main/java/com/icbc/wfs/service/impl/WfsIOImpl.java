@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.alibaba.dubbo.rpc.RpcContext;
+import com.icbc.dubbo.router.WfsRouter;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
 import com.icbc.wfs.service.WfsGet;
@@ -36,7 +37,7 @@ public class WfsIOImpl implements WfsIO {
 		 * 
 		 */
 
-		RpcContext.getContext().setAttachment("routeKey", path);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 		if (!wfsPut.put(path, in)) {
 			return false;
 		}
@@ -50,7 +51,7 @@ public class WfsIOImpl implements WfsIO {
 
 	@Override
 	public InputStream get(String path) {
-		RpcContext.getContext().setAttachment("routeKey", path);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 		return wfsGet.get(path);
 	}
 
@@ -72,16 +73,16 @@ public class WfsIOImpl implements WfsIO {
 			return false;
 		}
 
-		RpcContext.getContext().setAttachment("routeKey", path);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 
 		String directory = WfsUtil.getParent(path);
-		RpcContext.getContext().setAttachment("routeKey", directory);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
 		String fileName = WfsUtil.getFileName(path);
 		if (!wfsEdit.del(directory, fileName)) {
 			return false;
 		}
 
-		RpcContext.getContext().setAttachment("routeKey", path);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 		if (!wfsEdit.del(path)) {
 			return false;
 		}
@@ -95,7 +96,7 @@ public class WfsIOImpl implements WfsIO {
 	@Override
 	public List<String> list(String path) {
 
-		RpcContext.getContext().setAttachment("routeKey", path);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 		List<String> list = wfsGet.getList(path);
 		return list;
 
