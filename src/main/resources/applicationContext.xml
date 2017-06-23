@@ -9,23 +9,28 @@
        http://code.alibabatech.com/schema/dubbo
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
+    <context:property-placeholder location="classpath:application.properties" />
 	<!-- dubbo:annotation package="com.icbc.wfs" / -->
 	
 	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfs" />
-	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="zookeeper:2181" />
-	<dubbo:protocol name="hessian" port="8080" server="servlet" />
-	<dubbo:provider timeout="300000" />
-	
+
+	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${dubbo.registry.address}" />
+	<dubbo:protocol name="hessian" port="${dubbo.protocol.port}" server="servlet" />
+	<dubbo:provider timeout="${dubbo.provider.timeout}" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
-	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" group="0-8-A" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" version="0.0.1" group="0-8-A" />
-	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" version="0.0.1" cluster="forking" group="0-8-A" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsPut" ref="wfsPutImpl" version="0.0.1" group="${dubbo.service.group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsGet" ref="wfsGetImpl" version="0.0.1" group="${dubbo.service.group}" />
+	<dubbo:service interface="com.icbc.wfs.service.WfsEdit" ref="wfsEditImpl" version="0.0.1" cluster="forking" group="${dubbo.service.group}" />
 	<dubbo:consumer timeout="300000" check="false"/>
 	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" version="0.0.1" group="*" scope="remote" />
 	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" version="0.0.1" group="*" scope="remote" />
 	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" version="0.0.1" group="*" scope="remote" />
+	 
+	<bean id="propertyConfigurer" class="com.icbc.dubbo.util.PropertyConfigurer">
+	    <property name="location" value="classpath:application.properties" />  
+	</bean>
 	
 	<bean id="routerInitializer" class="com.icbc.dubbo.router.RouterInitializer">
 		<property name="registryClient" ref="registryClient" />

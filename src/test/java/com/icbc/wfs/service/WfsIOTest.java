@@ -10,7 +10,11 @@ public class WfsIOTest {
 		// TODO Auto-generated method stub
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext_test.xml");
 		WfsIO wfsIO = context.getBean(WfsIO.class);
-		wfsIO.put("/abcd/ef", new FileInputStream("B:\\Temp\\Chrysanthemum.jpg"));
+		if(wfsIO.put("/abcd/ef", new FileInputStream("/Users/timmyzhang/Downloads/Dash.zip"))){
+			System.out.println("done");
+		} else {
+			System.out.println("oops~");
+		}
 		context.close();
 	}
 }
