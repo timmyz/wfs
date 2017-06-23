@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.icbc.dubbo.router.WfsRouter;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
 
@@ -32,7 +31,7 @@ public class WfsEditImpl implements WfsEdit {
 
 	public boolean put0(String path) {
 		String directory = WfsUtil.getParent(path);
-		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
+		RpcContext.getContext().setAttachment("routeKey", directory);
 		String fileName = WfsUtil.getFileName(path);
 		return wfsEdit.put(directory, fileName);
 	}
@@ -48,32 +47,27 @@ public class WfsEditImpl implements WfsEdit {
 			// 创建虚拟文件夹
 			File vFolder = WfsUtil.getPhyFile(dir);
 			if (!vFolder.exists()) {
+
+				// 如果虚拟路径不等于根路径，则递归创建上级目录
+				if (!WfsUtil.ROOT.equals(dir)) {
+					if (!put0(dir)) {
+						return false;
+					}
+				}
 				vFolder.mkdirs();
 			}
 
 			// 创建假文件，HASH路径+真文件名
 			File vFile = new File(WfsUtil.getPhyFilePath(dir) + fileName);
-			
+
+			// 如果文件不存在，则创建目录
 			if (!vFile.exists()) {
 				vFile.createNewFile();
-			} else {
-				return true;
-			}
-
-			// 如果虚拟路径不等于根路径，则创建父路
-			if (!WfsUtil.ROOT.equals(dir)) {
-
-				String prntDir = WfsUtil.getParent(dir);
-				String grndPrntDir = WfsUtil.getParent(prntDir);
-				String prntFolder = WfsUtil.getFileName(prntDir);
-
-				// 按照父目录，调用
-				RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, prntDir);
-				return wfsEdit.put(grndPrntDir, prntFolder);
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 
 		return true;
