@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -14,13 +12,8 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.config.ServiceConfig;
-import com.alibaba.dubbo.container.spring.SpringContainer;
+import com.icbc.dubbo.util.SpringContextHolder;
 import com.icbc.dubbo.zk.ZKRegistryClient;
-import com.icbc.wfs.service.WfsEdit;
-import com.icbc.wfs.service.WfsGet;
-import com.icbc.wfs.service.WfsIO;
-import com.icbc.wfs.service.WfsPut;
-import com.icbc.wfs.service.impl.WfsEditImpl;
 
 /**
  * 路由初始化
@@ -35,7 +28,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent arg0) {
-		Map<String, ServiceConfig<?>> serviceConfigs = (Map) SpringContainer.getContext()
+		Map<String, ServiceConfig<?>> serviceConfigs = (Map) SpringContextHolder.getApplicationContext()
 				.getBeansOfType(ServiceConfig.class);
 		for (ServiceConfig<?> serviceConfig : serviceConfigs.values()) {
 			Class<?> clazz = serviceConfig.getInterfaceClass();
