@@ -9,10 +9,8 @@
        http://code.alibabatech.com/schema/dubbo
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
        
-	<!-- dubbo:annotation package="com.icbc.wfs" /-->
-	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfsTest" />
-	<dubbo:registry protocol="zookeeper" address="122.19.29.80:2181" />
-	<dubbo:reference id="wfsPut" interface="com.icbc.wfs.service.WfsPut" version="0.0.1" group="*" />
+	<dubbo:registry protocol="zookeeper" address="DELL:2181" />
+	<dubbo:reference id="wfsIO" interface="com.icbc.wfs.service.WfsIO" version="0.0.1" group="*" />
 	
 </beans>
