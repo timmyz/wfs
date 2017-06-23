@@ -34,6 +34,9 @@ public class RouterInitializer implements ApplicationListener<ContextStartedEven
                 (Map) SpringContainer.getContext().getBeansOfType(ServiceConfig.class);
         for (ServiceConfig<?> serviceConfig : serviceConfigs.values()) {
             Class<?> clazz = serviceConfig.getInterfaceClass();
+            if (null != (BusiRouterFlag) clazz.getAnnotation(BusiRouterFlag.class)) {
+                doRouter(serviceConfig, "business");
+            }
             if (null != (WfsRouterFlag) clazz.getAnnotation(WfsRouterFlag.class)) {
                 doRouter(serviceConfig, "wfsrouter");
             }

@@ -21,15 +21,18 @@ import com.icbc.dubbo.util.MurMurHash;
  * @author kfzx-wuzd
  * 
  */
-public class WfsRouter implements Router {
+public class BusiRouter implements Router {
     public static final String ROUTE_KEY = "routeKey";
     public static final String ROUTE_FLAG = "routeFlag";
+    public static final String FLAG_DEFAULT = "A";
+    public static final String FLAG_QUERY_ONLY = "B";
+    public static final String FLAG_ALL = "AB";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WfsRouter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusiRouter.class);
 
     private URL routerUrl;
 
-    public WfsRouter(URL routerUrl) {
+    public BusiRouter(URL routerUrl) {
         this.routerUrl = routerUrl;
     }
 
@@ -41,35 +44,44 @@ public class WfsRouter implements Router {
         if (null == routeField) {
             return invokers;
         }
-        List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField), routeFlag);
+        List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField),
+                null == routeFlag ? FLAG_DEFAULT : routeFlag);
+        if (result.isEmpty()) {
+            RpcException e = new RpcException("Not available.Service: " + url);
+            LOGGER.error(e);
+            throw e;
+        }
+        return result;
+    }
+
+
+    protected <T> List<Invoker<T>> findInvokers(List<Invoker<T>> invokers, long dubboL) {
+        List<Invoker<T>> result = new ArrayList<Invoker<T>>();
+        for (Invoker<T> invoker : invokers) {
+            long ipL = 0;
+            for (String ipS : invoker.getUrl().getIp().split("\\.")) {
+                ipL = (ipL << 8) + Long.parseLong(ipS);
+            }
+            ipL = (ipL << 16) + invoker.getUrl().getPort();
+            if (dubboL == ipL) {
+                result.add(invoker);
+            }
+        }
         return result;
     }
 
     protected <T> List<Invoker<T>> findInvokers(List<Invoker<T>> invokers, long hashValue,
             String routeFlag) {
         List<Invoker<T>> result = new ArrayList<Invoker<T>>();
-        char minFlag = '|';
-        Invoker<T> finalInvoker = null;
         for (Invoker<T> invoker : invokers) {
             try {
-                String group[] = invoker.getUrl().getParameter("group").split("-");
-                int l = group.length;
-                char flag = group[--l].charAt(0);
-                if (minFlag < flag || null != routeFlag && 0 < routeFlag.indexOf(flag)) {
-                    continue;
-                }
-                while (1 < l) {
-                    if (MurMurHash.withInRange(hashValue, group[--l], group[--l])) {
-                        finalInvoker = invoker;
-                        minFlag = flag;
-                    }
+                if (MurMurHash.withInRange(invoker.getUrl().getParameter("group").split("-"),
+                        hashValue, routeFlag)) {
+                    result.add(invoker);
                 }
             } catch (Exception e) {
                 LOGGER.error(e);
             }
-        }
-        if (null != finalInvoker) {
-            result.add(finalInvoker);
         }
         return result;
     }

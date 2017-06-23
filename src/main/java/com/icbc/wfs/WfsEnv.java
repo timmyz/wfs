@@ -1,10 +1,7 @@
 package com.icbc.wfs;
 
-import com.icbc.dubbo.util.PropertyConfigurer;
-
 public class WfsEnv {
-	public static final String ROOT_DIR = getRootDir();
-	private static String getRootDir() {
-		return (String) PropertyConfigurer.getContextProperty("rootDir");
-	}
+    public static final String ROOT_DIR = System.getProperty("rootDir");
+    public static final String GROUP = System.getProperty("dubbo.service.group");
+    public static final String GROUP_FLAG = GROUP.substring(GROUP.lastIndexOf("-") + 1);
 }
