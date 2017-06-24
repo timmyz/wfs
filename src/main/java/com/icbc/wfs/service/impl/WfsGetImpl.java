@@ -1,5 +1,6 @@
 package com.icbc.wfs.service.impl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,17 +24,17 @@ import com.icbc.wfs.service.WfsGet;
 public class WfsGetImpl implements WfsGet {
 	private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
 
-	@Override
-	public InputStream get(String path) {
-		FileInputStream fin = null;
-		try {
-			fin = new FileInputStream(WfsUtil.getPhyFile(path));
-		} catch (FileNotFoundException e) {
-			logger.warn("get-->FileNotFoundException" + path, e);
-			throw new RpcException();
-		}
-		return fin;
-	}
+    @Override
+    public InputStream get(String path) {
+        InputStream fin = null;
+        try {
+            fin = new BufferedInputStream(new FileInputStream(WfsUtil.getPhyFile(path)));
+        } catch (FileNotFoundException e) {
+            logger.warn("get-->FileNotFoundException" + path, e);
+            throw new RpcException();
+        }
+        return fin;
+    }
 
 	/**
 	 * 物理层实现ls命令，获取文件列表
