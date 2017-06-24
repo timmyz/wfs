@@ -1,8 +1,8 @@
 package com.icbc.wfs.service;
 
-import com.icbc.dubbo.router.BusiRouterFlag;
+import com.icbc.dubbo.router.HashRouterFlag;
 
-@BusiRouterFlag
+@HashRouterFlag
 public interface WfsEdit {
 
 	boolean[] del(String path);

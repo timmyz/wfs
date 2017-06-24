@@ -1,2 +1,2 @@
 wfsrouter=com.icbc.dubbo.router.WfsRouterFactory
-business=com.icbc.dubbo.router.BusiRouterFactory
+hashrouter=com.icbc.dubbo.router.HashRouterFactory

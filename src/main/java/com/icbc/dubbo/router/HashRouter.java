@@ -6,8 +6,6 @@ import java.util.List;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.config.ServiceConfig;
-import com.alibaba.dubbo.container.spring.SpringContainer;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.RpcContext;
@@ -21,32 +19,38 @@ import com.icbc.dubbo.util.MurMurHash;
  * @author kfzx-wuzd
  * 
  */
-public class BusiRouter implements Router {
+public class HashRouter implements Router {
+    public static final String NAME = "hashrouter";
+    
     public static final String ROUTE_KEY = "routeKey";
+    public static final String ROUTE_VALUE = "routeValue";
     public static final String ROUTE_FLAG = "routeFlag";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BusiRouter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HashRouter.class);
 
     private URL routerUrl;
 
-    public BusiRouter(URL routerUrl) {
+    public HashRouter(URL routerUrl) {
         this.routerUrl = routerUrl;
     }
 
     @Override
     public <T> List<Invoker<T>> route(List<Invoker<T>> invokers, URL url, Invocation invocation)
             throws RpcException {
-        String routeField = RpcContext.getContext().getAttachment(ROUTE_KEY);
+        long hash;
+        String routeValue = RpcContext.getContext().getAttachment(ROUTE_VALUE);
+        if (null != routeValue) {
+            hash = MurMurHash.nParseLong(routeValue);
+        } else {
+            String routeField = RpcContext.getContext().getAttachment(ROUTE_KEY);
+            if (null == routeField) {
+                return invokers;
+            } else {
+                hash = MurMurHash.hash(routeField);
+            }
+        }
         String routeFlag = RpcContext.getContext().getAttachment(ROUTE_FLAG);
-        if (null == routeField) {
-            return invokers;
-        }
-        List<Invoker<T>> result = findInvokers(invokers, MurMurHash.hash(routeField), routeFlag);
-        if (result.isEmpty()) {
-            RpcException e = new RpcException("Not available.Service: " + url);
-            LOGGER.error(e);
-            throw e;
-        }
+        List<Invoker<T>> result = findInvokers(invokers, hash, routeFlag);
         return result;
     }
 
@@ -80,11 +84,6 @@ public class BusiRouter implements Router {
             }
         }
         return result;
-    }
-
-    public static String[] getServiceGroup(String name) {
-        return SpringContainer.getContext().getBean("qpayentService", ServiceConfig.class)
-                .getGroup().split("-");
     }
 
     @Override

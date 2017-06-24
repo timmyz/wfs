@@ -22,6 +22,8 @@ import com.icbc.dubbo.util.MurMurHash;
  * 
  */
 public class WfsRouter implements Router {
+    public static final String NAME = "wfsrouter";
+    
     public static final String ROUTE_KEY = "routeKey";
     public static final String ROUTE_FLAG = "routeFlag";
 

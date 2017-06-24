@@ -3,9 +3,9 @@ package com.icbc.wfs.service;
 import java.io.InputStream;
 import java.util.List;
 
-import com.icbc.dubbo.router.BusiRouterFlag;
+import com.icbc.dubbo.router.HashRouterFlag;
 
-@BusiRouterFlag
+@HashRouterFlag
 public interface WfsGet {
 	
 	InputStream get(String path);

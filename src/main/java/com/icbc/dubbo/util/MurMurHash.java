@@ -81,7 +81,7 @@ public class MurMurHash {
         return h;
     }
 
-    private static long nParseLong(String s) throws NumberFormatException {
+    public static long nParseLong(String s) throws NumberFormatException {
         if (s == null) {
             throw new NumberFormatException("null");
         }
