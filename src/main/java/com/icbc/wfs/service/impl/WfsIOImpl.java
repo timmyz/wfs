@@ -1,6 +1,7 @@
 package com.icbc.wfs.service.impl;
 
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 
@@ -90,8 +91,13 @@ public class WfsIOImpl implements WfsIO {
      */
     @Override
     public List<String> list(String path) {
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-        List<String> list = wfsGet.getList(path);
+        List<String> list = new LinkedList<String>();
+        if (!WfsUtil.isDirectory(path)) {
+            list.add(WfsUtil.getFileName(path));
+        } else {
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            list = wfsGet.getList(path);
+        }
         return list;
     }
 }

@@ -54,22 +54,6 @@ public class HashRouter implements Router {
         return result;
     }
 
-
-    protected <T> List<Invoker<T>> findInvokers(List<Invoker<T>> invokers, long dubboL) {
-        List<Invoker<T>> result = new ArrayList<Invoker<T>>();
-        for (Invoker<T> invoker : invokers) {
-            long ipL = 0;
-            for (String ipS : invoker.getUrl().getIp().split("\\.")) {
-                ipL = (ipL << 8) + Long.parseLong(ipS);
-            }
-            ipL = (ipL << 16) + invoker.getUrl().getPort();
-            if (dubboL == ipL) {
-                result.add(invoker);
-            }
-        }
-        return result;
-    }
-
     protected <T> List<Invoker<T>> findInvokers(List<Invoker<T>> invokers, long hashValue,
             String routeFlag) {
         List<Invoker<T>> result = new ArrayList<Invoker<T>>();
