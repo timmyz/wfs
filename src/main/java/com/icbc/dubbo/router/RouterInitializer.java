@@ -14,6 +14,7 @@ import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.icbc.dubbo.util.SpringContextHolder;
 import com.icbc.dubbo.zk.ZKRegistryClient;
+import com.icbc.wfs.WfsRestorer;
 
 /**
  * 路由初始化
@@ -28,6 +29,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent arg0) {
+    	
         Map<String, ServiceConfig<?>> serviceConfigs = (Map) SpringContextHolder
                 .getApplicationContext().getBeansOfType(ServiceConfig.class);
         for (ServiceConfig<?> serviceConfig : serviceConfigs.values()) {
@@ -39,6 +41,8 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
                 doRouter(serviceConfig, WfsRouter.NAME);
             }
         }
+        
+        WfsRestorer.doRestore();
     }
 
     private void doRouter(ServiceConfig<?> serviceConfig, String router) {

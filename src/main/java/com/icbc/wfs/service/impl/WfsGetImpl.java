@@ -65,17 +65,24 @@ public class WfsGetImpl implements WfsGet {
 					File fileOne = fileArr[i];
 
 					if (fileOne.isFile()) {
-						
-						String str = FileType.EmptyFile;;
+
+						String str = FileType.EmptyFile;
+						;
 						if (fileOne.length() > 0) {
 							str = FileType.DataFile;
 						}
-						
+
 						fileList.add(str + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
 
 					} else if (fileOne.isDirectory()) {
-						fileList.add(FileType.Directory+":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
-						// fileList.addAll(getPhyList(fileOne.getPath()));
+						
+						fileList.add(FileType.Directory + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
+						
+						List<String> tmpList = getPhyList(fileOne.getPath().substring(file.getPath().length()));
+						if (tmpList != null) {
+							fileList.addAll(tmpList);
+						}
+						
 					}
 				}
 				return fileList;
