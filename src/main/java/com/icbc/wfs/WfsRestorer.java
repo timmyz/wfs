@@ -28,6 +28,8 @@ public class WfsRestorer {
 		for (String folder : WfsEnv.HashFolders) {
 
 			RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, folder);
+			RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
+			
 			List<String> fileList = wfsGet.getPhyList(folder);
 
 			List<String> phyFileList = new LinkedList<String>();
@@ -74,7 +76,10 @@ public class WfsRestorer {
 					File phyFile = WfsUtil.getPhyFile(WfsEnv.ROOT_DIR + phyFilePath);
 
 					if (!phyFile.exists()) {
+						
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFilePath);
+						RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
+						
 						if (!WfsPutImpl.putPhy(wfsGet.getPhy(phyFilePath), phyFile)) {
 							logger.error("doRestore.putPhy-->false");
 						}
