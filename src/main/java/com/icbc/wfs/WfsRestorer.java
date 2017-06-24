@@ -2,6 +2,7 @@ package com.icbc.wfs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,16 +23,14 @@ public class WfsRestorer {
 
 	public static void doRestore() {
 
-		
 		logger.info("prepare restore");
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			logger.info("restore sleep error");
 		}
 		logger.info("do restore");
-		
-		
+
 		WfsGet wfsGet = (WfsGet) SpringContextHolder.getApplicationContext().getBean("wfsGet", WfsGet.class);
 
 		for (String folder : WfsEnv.HashFolders) {
@@ -39,18 +38,18 @@ public class WfsRestorer {
 			RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, folder);
 			RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
 			List<String> fileList = new LinkedList<String>();
-			
+
 			try {
 				fileList = wfsGet.getPhyList(folder);
-				if(fileList==null||fileList.isEmpty()||fileList.size()==0){
-					logger.info("doRestore-->folder not exit:"+folder);
+				if (fileList == null || fileList.isEmpty() || fileList.size() == 0) {
+					logger.info("doRestore-->folder not exit:" + folder);
 					continue;
 				}
 			} catch (NoSuchElementException e) {
-				logger.info("doRestore-->NoSuchElementException:"+folder);
+				logger.info("doRestore-->NoSuchElementException:" + folder);
 				continue;
 			}
-			
+
 			List<String> phyFileList = new LinkedList<String>();
 
 			for (String fileInfo : fileList) {
@@ -92,20 +91,26 @@ public class WfsRestorer {
 
 				for (String phyFilePath : phyFileList) {
 
-					File phyFile = WfsUtil.getPhyFile(WfsEnv.ROOT_DIR + phyFilePath);
+					File phyFile = new File(WfsEnv.ROOT_DIR + phyFilePath);
 
 					if (!phyFile.exists()) {
 
-						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFilePath);
+						String phyFileName = phyFilePath.substring((WfsUtil.PATH_SEPARATOR + folder).length());
+						
+						logger.info("doRestore.putPhy:"+phyFileName);
+						
+						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
-
-						if (!WfsPutImpl.putPhy(wfsGet.getPhy(phyFilePath), phyFile)) {
+						
+						InputStream stream = wfsGet.getPhy(phyFileName);
+						
+						if (!WfsPutImpl.putPhy(stream, phyFile)) {
 							logger.error("doRestore.putPhy-->false");
 						}
 					}
 				}
 			}
-			logger.info("doRestore-->folder synchronized:"+folder);
+			logger.info("doRestore-->folder synchronized:" + folder);
 		}
 	}
 }

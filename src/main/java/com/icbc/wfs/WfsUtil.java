@@ -43,8 +43,12 @@ public class WfsUtil {
 
     public static String getPhyFilePath(String path) {
         String hash = MurMurHash.hashRange(path);
-        return WfsEnv.ROOT_DIR + (WfsEnv.ROOT_DIR.endsWith(File.separator) ? "" : File.separator)
-                + hash.substring(0, 2) + File.separator + hash;
+        return getPhyFilePathByHash(hash);
+    }
+    
+    public static String getPhyFilePathByHash(String hash) {
+        return WfsEnv.ROOT_DIR
+                + hash.substring(0, WfsEnv.PHY_DIR_LENGTH) + File.separator + hash;
     }
 
     public static File getPhyFile(String path) {

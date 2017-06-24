@@ -21,36 +21,36 @@ import com.icbc.wfs.service.WfsGet;
 // @Service(version = "0.0.1")
 @Service("wfsGetImpl")
 public class WfsGetImpl implements WfsGet {
-    private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
 
-    @Override
-    public InputStream get(String path) {
-        FileInputStream fin = null;
-        try {
-            fin = new FileInputStream(WfsUtil.getPhyFile(path));
-        } catch (FileNotFoundException e) {
-            logger.warn("get-->FileNotFoundException" + path, e);
-            throw new RpcException();
-        }
-        return fin;
-    }
+	@Override
+	public InputStream get(String path) {
+		FileInputStream fin = null;
+		try {
+			fin = new FileInputStream(WfsUtil.getPhyFile(path));
+		} catch (FileNotFoundException e) {
+			logger.warn("get-->FileNotFoundException" + path, e);
+			throw new RpcException();
+		}
+		return fin;
+	}
 
-    /**
-     * 物理层实现ls命令，获取文件列表
-     */
-    @Override
-    public List<String> getList(String path) {
-        File dir = WfsUtil.getPhyFile(path);
-        if (!dir.exists() && !dir.isDirectory()) {
-            throw new RpcException();
-        }
-        List<String> fileList = new LinkedList<String>();
-        File[] fileArray = dir.listFiles();
-        for (int i = 0; i < fileArray.length; i++) {
-            fileList.add(fileArray[i].getName());
-        }
-        return fileList;
-    }
+	/**
+	 * 物理层实现ls命令，获取文件列表
+	 */
+	@Override
+	public List<String> getList(String path) {
+		File dir = WfsUtil.getPhyFile(path);
+		if (!dir.exists() && !dir.isDirectory()) {
+			throw new RpcException();
+		}
+		List<String> fileList = new LinkedList<String>();
+		File[] fileArray = dir.listFiles();
+		for (int i = 0; i < fileArray.length; i++) {
+			fileList.add(fileArray[i].getName());
+		}
+		return fileList;
+	}
 
 	/*
 	 * 递归获取目录下所有文件及文件夹
@@ -90,7 +90,8 @@ public class WfsGetImpl implements WfsGet {
 					} else if (fileOne.isDirectory()) {
 
 						fileList.add(FileType.Directory + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
-						String childPath = path + WfsUtil.PATH_SEPARATOR + fileOne.getPath().substring(file.getPath().length()+1);
+						String childPath = path + WfsUtil.PATH_SEPARATOR
+								+ fileOne.getPath().substring(file.getPath().length() + 1);
 						List<String> tmpList = getPhyList(childPath);
 						if (tmpList != null) {
 							fileList.addAll(tmpList);
@@ -109,10 +110,20 @@ public class WfsGetImpl implements WfsGet {
 		return fileList;
 	}
 
-    @Override
-    public InputStream getPhy(String path) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public InputStream getPhy(String path) {
+
+		FileInputStream fin = null;
+		try {
+			
+			String phyPath = WfsUtil.getPhyFilePathByHash(path);
+			fin = new FileInputStream(phyPath);
+			
+		} catch (FileNotFoundException e) {
+			logger.warn("get-->FileNotFoundException" + path, e);
+			throw new RpcException();
+		}
+		return fin;
+	}
 
 }
