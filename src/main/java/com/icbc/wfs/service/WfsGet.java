@@ -9,5 +9,6 @@ import com.icbc.dubbo.router.BusiRouterFlag;
 public interface WfsGet {
 	
 	InputStream get(String path);
+	InputStream getPhy(String path);
 	List<String> getList(String path);
 }

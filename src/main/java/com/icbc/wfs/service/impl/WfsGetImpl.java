@@ -39,7 +39,7 @@ public class WfsGetImpl implements WfsGet {
 		List<String> fileList = new LinkedList<String>();
 		File[] fileArray = dir.listFiles();
 		for (int i = 0; i < fileArray.length; i++) {
-				fileList.add(fileArray[i].getName());
+			fileList.add(fileArray[i].getName());
 		}
 		return fileList;
 	}
@@ -47,9 +47,9 @@ public class WfsGetImpl implements WfsGet {
 	/*
 	 * 递归获取目录下所有文件及文件夹
 	 */
-	public static List<String> getFileListRcrsv(String path) {
+	public static List<String> getFileListRcrsv(String folder) {
 
-		File file = new File(path);
+		File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + folder);
 		List<String> fileList = new LinkedList<String>();
 		if (file.exists()) {
 			if (file.isDirectory()) {
@@ -84,4 +84,11 @@ public class WfsGetImpl implements WfsGet {
 		}
 		return fileList;
 	}
+
+	@Override
+	public InputStream getPhy(String path) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
