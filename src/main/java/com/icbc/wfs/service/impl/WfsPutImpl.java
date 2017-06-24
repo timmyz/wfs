@@ -24,6 +24,8 @@ public class WfsPutImpl implements WfsPut {
 
 	@Resource
 	private WfsPut wfsPut;
+	@Resource
+	private WfsEditImpl wfsEditImpl;
 
 	public boolean put(String path, String flag, InputStream in) {
 		File phyFile = WfsUtil.getPhyFile(path);
@@ -32,7 +34,6 @@ public class WfsPutImpl implements WfsPut {
 				return false;
 			}
 		}
-
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(phyFile);
@@ -43,7 +44,7 @@ public class WfsPutImpl implements WfsPut {
 			}
 			out.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
+			return false;
 		} finally {
 			try {
 				if (null != out) {
@@ -53,25 +54,31 @@ public class WfsPutImpl implements WfsPut {
 					in.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				return false;
 			}
 		}
 
-		FileInputStream myIn = null;
+		FileInputStream nextIn = null;
+		boolean ret = false;
 		try {
-			myIn = new FileInputStream(phyFile);
-			return put0(path, flag, myIn);
+			nextIn = new FileInputStream(phyFile);
+			ret = put0(path, flag, nextIn);
 		} catch (FileNotFoundException e) {
 			return false;
 		} finally {
 			try {
-				if (null != myIn) {
-					myIn.close();
+				if (null != nextIn) {
+					nextIn.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				return false;
 			}
 		}
+		if (!ret) {
+			phyFile.delete();
+			return false;
+		}
+		return true;
 	}
 
 	public boolean put0(String path, String flag, InputStream in) {

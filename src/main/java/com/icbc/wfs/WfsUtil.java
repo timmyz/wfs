@@ -61,4 +61,13 @@ public class WfsUtil {
 		}
 		return true;
 	}
+
+	public static boolean mergerFalse(boolean[] booleans) {
+		for (boolean b : booleans) {
+			if (!b) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

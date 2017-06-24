@@ -32,25 +32,16 @@ public class WfsGetImpl implements WfsGet {
 	 */
 	@Override
 	public List<String> getList(String path) {
-
-		List<String> fileList = new LinkedList<String>();
-
 		File dir = WfsUtil.getPhyFile(path);
-
 		if (!dir.exists() && !dir.isDirectory()) {
-			return null;
+			throw new RpcException();
 		}
-
+		List<String> fileList = new LinkedList<String>();
 		File[] fileArray = dir.listFiles();
-
 		for (int i = 0; i < fileArray.length; i++) {
-			if (fileArray[i].isFile()) {
-
 				fileList.add(fileArray[i].getName());
-			}
 		}
-
-		return null;
+		return fileList;
 	}
 
 	/*

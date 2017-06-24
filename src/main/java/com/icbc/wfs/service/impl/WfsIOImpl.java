@@ -32,16 +32,16 @@ public class WfsIOImpl implements WfsIO {
 	@Override
 	public boolean put(String path, InputStream in) {
 
-		/*
-		 * 1. 请求应该为目录所在服务器，先读取写入目录文件 2.
-		 * 
-		 */
-
-		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-		if (!wfsPut.put(path, "", in)) {
-			return false;
+		if (!path.endsWith(WfsUtil.PATH_SEPARATOR)) {
+			RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+			if (!wfsPut.put(path, "", in)) {
+				return false;
+			}
 		}
-		wfsEditImpl.put0(path);
+
+		if (!WfsUtil.mergerFalse(wfsEditImpl.put0(path))) {
+			wfsEdit.del(path);
+		}
 		return true;
 	}
 
@@ -73,12 +73,11 @@ public class WfsIOImpl implements WfsIO {
 		String directory = WfsUtil.getParent(path);
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
 		String fileName = WfsUtil.getFileName(path);
-		wfsEdit.del(directory, fileName);
-
+		if (!WfsUtil.mergerFalse(wfsEdit.del(directory, fileName))) {
+			return false;
+		}
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-		wfsEdit.del(path);
-
-		return true;
+		return WfsUtil.mergerFalse(wfsEdit.del(path));
 	}
 
 	/**
@@ -86,30 +85,8 @@ public class WfsIOImpl implements WfsIO {
 	 */
 	@Override
 	public List<String> list(String path) {
-
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 		List<String> list = wfsGet.getList(path);
 		return list;
-
-		// 更换实现方法，这个作废
-		// try {
-		//
-		// InputStreamReader streamReader = new
-		// InputStreamReader(wfsGet.get(path));
-		// BufferedReader bufferedReader = new BufferedReader(streamReader);
-		//
-		// String line = null;
-		//
-		// while ((line = bufferedReader.readLine()) != null) {
-		// list.add(line);
-		// }
-		//
-		// streamReader.close();
-		// bufferedReader.close();
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-
 	}
 }
