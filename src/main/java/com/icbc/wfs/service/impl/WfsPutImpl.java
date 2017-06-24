@@ -1,11 +1,14 @@
 package com.icbc.wfs.service.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Resource;
@@ -37,10 +40,10 @@ public class WfsPutImpl implements WfsPut {
 			return false;
 		}
 
-		FileInputStream nextIn = null;
+		InputStream nextIn = null;
 		boolean ret = false;
 		try {
-			nextIn = new FileInputStream(phyFile);
+			nextIn = new BufferedInputStream(new FileInputStream(phyFile));
 			ret = put0(path, flag, nextIn);
 		} catch (FileNotFoundException e) {
 			return false;
@@ -70,9 +73,9 @@ public class WfsPutImpl implements WfsPut {
 			}
 		}
 		
-		FileOutputStream out = null;
+		OutputStream out = null;
 		try {
-			out = new FileOutputStream(phyFile);
+			out = new BufferedOutputStream(new FileOutputStream(phyFile));
 			int n = -1;
 			byte[] b = new byte[0x2000];
 			while (-1 != (n = in.read(b))) {
