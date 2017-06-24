@@ -9,5 +9,5 @@ public interface WfsEdit {
 
 	boolean[] put(String directory, String fileName);
 
-	boolean[] del(String directory, String fileName);
+	boolean[] delDir(String directory, String fileName);
 }

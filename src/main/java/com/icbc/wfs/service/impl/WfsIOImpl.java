@@ -78,7 +78,7 @@ public class WfsIOImpl implements WfsIO {
         String directory = WfsUtil.getParent(path);
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
         String fileName = WfsUtil.getFileName(path);
-        if (!WfsUtil.mergerFalse(wfsEdit.del(directory, fileName))) {
+        if (!WfsUtil.mergerFalse(wfsEdit.delDir(directory, fileName))) {
             return false;
         }
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);

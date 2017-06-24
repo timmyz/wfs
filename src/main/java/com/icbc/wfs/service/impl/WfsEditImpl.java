@@ -26,7 +26,7 @@ public class WfsEditImpl implements WfsEdit {
         File phyFile = WfsUtil.getPhyFile(path);
         if (phyFile.exists()) {
             if (!phyFile.delete()) {
-                logger.error("del--> delete");
+                logger.error("del--> delete" + phyFile.getName());
                 return new boolean[] {false};
             }
         }
@@ -80,19 +80,18 @@ public class WfsEditImpl implements WfsEdit {
     }
 
     @Override
-    public boolean[] del(String directory, String fileName) {
+    public boolean[] delDir(String directory, String fileName) {
         File dirPhyFile = WfsUtil.getPhyFile(directory);
         if (dirPhyFile.exists() && dirPhyFile.isDirectory()) {
             File phyFile = new File(dirPhyFile.getAbsolutePath() + File.separator + fileName);
             if (phyFile.exists()) {
                 if (!phyFile.delete()) {
-                    logger.error("del-->delete ");
+                    logger.error("del-->delete" + phyFile.getName());
                     return new boolean[] {false};
                 }
             }
         }
-        logger.error("del-->dir not exist");
-        return new boolean[] {false};
+        return new boolean[] {true};
     }
 
 }

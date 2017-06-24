@@ -90,4 +90,7 @@
 			<version>1.7.25</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>wfs</finalName>
+	</build>
 </project>

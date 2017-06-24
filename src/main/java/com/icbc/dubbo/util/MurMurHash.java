@@ -20,12 +20,12 @@ public class MurMurHash {
             throw new NullPointerException(key);
         }
     }
-    
+
     public static boolean withInRange(String[] group, long hashValue, String routeFlag,
             boolean flag) {
         int l = group.length;
         String groupFlag = group[--l];
-        if (null != routeFlag && flag^routeFlag.contains(groupFlag)) {
+        if (null != routeFlag && flag ^ routeFlag.contains(groupFlag)) {
             return false;
         }
         while (1 < l) {

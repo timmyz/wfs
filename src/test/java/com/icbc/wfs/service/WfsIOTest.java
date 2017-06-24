@@ -9,66 +9,74 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class WfsIOTest {
 
-	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
-	    String timmyInputPath = "/Users/timmyzhang/Downloads/Dash.zip";
-	    String wuzdInputPath = "B:\\Temp\\Chrysanthemum.jpg";
-	    String bruceInputPath = "";
-	    
-	    String timmyOutputPath = "/Users/timmyzhang/temp/output/Dash.zip";
-	    String wuzdOutputPath = "B:\\Chrysanthemum.jpg";
-	    String bruceOutputPath = "";
-	 
-		
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext_test.xml");
-		WfsIO wfsIO = context.getBean(WfsIO.class);
-		boolean fst = true;
-		while (true) {
-			if (fst || '\n' == System.in.read()) {
-				fst = false;
-				FileInputStream in = null;
-				try {
-					String path = "/ab/cd/ef";
-					in = new FileInputStream(wuzdInputPath);
-					if (wfsIO.put(path, in)) {
-						System.out.println("put done");
-						InputStream getIn = wfsIO.get(path);
-						FileOutputStream out = null;
-						try {
-							out = new FileOutputStream(wuzdOutputPath);
-							int n = -1;
-							byte[] b = new byte[0x2000];
-							while (-1 != (n = getIn.read(b))) {
-								out.write(b, 0, n);
-							}
-							out.flush();
-						} finally {
-							if (null != out) {
-								out.close();
-							}
-							if (null != getIn) {
-								getIn.close();
-							}
-						}
-					} else {
-						System.out.println("put oops~");
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				} catch (Throwable t) {
-					break;
-				} finally {
-					try {
-						if (null != in) {
-							in.close();
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+    public static void main(String[] args) throws Exception {
+        // TODO Auto-generated method stub
+        String timmyInputPath = "/Users/timmyzhang/Downloads/Dash.zip";
+        String wuzdInputPath = "B:\\Temp\\Chrysanthemum.jpg";
+        String bruceInputPath = "";
 
-			}
-		}
-		context.close();
-	}
+        String timmyOutputPath = "/Users/timmyzhang/temp/output/Dash.zip";
+        String wuzdOutputPath = "B:\\Chrysanthemum.jpg";
+        String bruceOutputPath = "";
+
+
+        ClassPathXmlApplicationContext context =
+                new ClassPathXmlApplicationContext("applicationContext_test.xml");
+        WfsIO wfsIO = context.getBean(WfsIO.class);
+        boolean fst = true;
+        while (true) {
+            if (fst || '\n' == System.in.read()) {
+                fst = false;
+                FileInputStream in = null;
+                try {
+                    String path = "/ab/cd/ef";
+                    in = new FileInputStream(wuzdInputPath);
+                    if (wfsIO.put(path, in)) {
+                        System.out.println("put done");
+
+                        InputStream getIn = wfsIO.get(path);
+                        FileOutputStream out = null;
+                        try {
+                            out = new FileOutputStream(wuzdOutputPath);
+                            int n = -1;
+                            byte[] b = new byte[0x2000];
+                            while (-1 != (n = getIn.read(b))) {
+                                out.write(b, 0, n);
+                            }
+                            out.flush();
+                        } finally {
+                            if (null != out) {
+                                out.close();
+                            }
+                            if (null != getIn) {
+                                getIn.close();
+                            }
+                        }
+
+                        if (wfsIO.del(path)) {
+                            System.out.println("del  done");
+                        } else {
+                            System.out.println("del  oops");
+                        }
+                    } else {
+                        System.out.println("put oops~");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } catch (Throwable t) {
+                    break;
+                } finally {
+                    try {
+                        if (null != in) {
+                            in.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }
+        context.close();
+    }
 }

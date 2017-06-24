@@ -14,7 +14,7 @@
 	<context:component-scan base-package="com.icbc.wfs" />
 	<dubbo:application name="wfs" />
 	<dubbo:registry id="dubboregistry1" protocol="zookeeper"  address="${zkaddress}" />
-	<dubbo:protocol name="hessian" server="servlet" port="${dubbo.protocol.port}" />
+	<dubbo:protocol name="hessian" port="${dubbo.protocol.port}" server="servlet" contextpath="wfs" />
 	<dubbo:provider delay="-1" />
 	<dubbo:service interface="com.icbc.wfs.service.WfsIO" ref="wfsIOImpl" version="0.0.1" />
 	
