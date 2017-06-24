@@ -29,7 +29,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent arg0) {
-    	
+
         Map<String, ServiceConfig<?>> serviceConfigs = (Map) SpringContextHolder
                 .getApplicationContext().getBeansOfType(ServiceConfig.class);
         for (ServiceConfig<?> serviceConfig : serviceConfigs.values()) {
@@ -41,7 +41,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
                 doRouter(serviceConfig, WfsRouter.NAME);
             }
         }
-//        WfsRestorer.doRestore();
+        WfsRestorer.doRestore();
     }
 
     private void doRouter(ServiceConfig<?> serviceConfig, String router) {
