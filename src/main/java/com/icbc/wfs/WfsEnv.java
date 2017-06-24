@@ -40,7 +40,7 @@ public class WfsEnv {
             long beginInt = WfsUtil.nParseLong(groupArr[--l]);
             long endInt = WfsUtil.nParseLong(groupArr[--l]);
             for (long i = beginInt; i < endInt; i++) {
-                hashFolders.add(Long.toHexString(-i));
+                hashFolders.add(String.format("%"+PHY_DIR_LENGTH+"s", Long.toHexString(-i)).replace(' ','0'));
             }
         }
 
