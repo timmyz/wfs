@@ -41,8 +41,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
                 doRouter(serviceConfig, WfsRouter.NAME);
             }
         }
-        
-        WfsRestorer.doRestore();
+//        WfsRestorer.doRestore();
     }
 
     private void doRouter(ServiceConfig<?> serviceConfig, String router) {
