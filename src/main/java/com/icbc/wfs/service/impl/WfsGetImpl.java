@@ -47,9 +47,11 @@ public class WfsGetImpl implements WfsGet {
 	/*
 	 * 递归获取目录下所有文件及文件夹
 	 */
-	public static List<String> getFileListRcrsv(String folder) {
+	@Override
+	public List<String> getPhyList(String path) {
 
-		File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + folder);
+		File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + path);
+
 		List<String> fileList = new LinkedList<String>();
 		if (file.exists()) {
 			if (file.isDirectory()) {
@@ -70,8 +72,7 @@ public class WfsGetImpl implements WfsGet {
 
 					} else if (fileOne.isDirectory()) {
 						fileList.add("2:" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
-						fileList.addAll(getFileListRcrsv(fileOne.getPath()));
-
+						// fileList.addAll(getPhyList(fileOne.getPath()));
 					}
 				}
 				return fileList;
