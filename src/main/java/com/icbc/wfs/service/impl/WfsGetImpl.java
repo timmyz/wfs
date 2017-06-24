@@ -51,58 +51,62 @@ public class WfsGetImpl implements WfsGet {
         return fileList;
     }
 
-    /*
-     * 递归获取目录下所有文件及文件夹
-     */
-    @Override
-    public List<String> getPhyList(String path) {
+	/*
+	 * 递归获取目录下所有文件及文件夹
+	 */
+	@Override
+	public List<String> getPhyList(String path) {
 
-        File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + path);
+		File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + path);
 
-        List<String> fileList = new LinkedList<String>();
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                File[] fileArr = file.listFiles();
-                if (fileArr == null) {
-                    return fileList;
-                }
-                for (int i = 0; i < fileArr.length; i++) {
+		List<String> fileList = new LinkedList<String>();
+		if (file.exists()) {
+			if (file.isDirectory()) {
+				File[] fileArr = file.listFiles();
+				if (fileArr == null) {
+					return fileList;
+				}
+				for (int i = 0; i < fileArr.length; i++) {
 
-                    File fileOne = fileArr[i];
+					File fileOne = fileArr[i];
 
-                    if (fileOne.isFile()) {
+					if (fileOne.isFile()) {
 
-                        String str = FileType.EmptyFile;;
-                        if (fileOne.length() > 0) {
-                            str = FileType.DataFile;
-                        }
+						String str = FileType.EmptyFile;
 
-                        fileList.add(
-                                str + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
+						if (fileOne.length() > 0) {
+							try {
+								MurMurHash.nParseLong(fileOne.getName());
+							} catch (NumberFormatException e) {
+								logger.error("getPhyList:" + fileOne.getPath() + " is not valid file");
+								continue;
+							}
+							str = FileType.DataFile;
+						}
 
-                    } else if (fileOne.isDirectory()) {
+						fileList.add(str + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
 
-                        fileList.add(FileType.Directory + ":"
-                                + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
+					} else if (fileOne.isDirectory()) {
 
-                        List<String> tmpList =
-                                getPhyList(fileOne.getPath().substring(file.getPath().length()));
-                        if (tmpList != null) {
-                            fileList.addAll(tmpList);
-                        }
+						fileList.add(FileType.Directory + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
+						String childPath = path + WfsUtil.PATH_SEPARATOR + fileOne.getPath().substring(file.getPath().length()+1);
+						List<String> tmpList = getPhyList(childPath);
+						if (tmpList != null) {
+							fileList.addAll(tmpList);
+						}
 
-                    }
-                }
-                return fileList;
-            } else if (file.isFile()) {
-                fileList.add(file.getPath());
-                return fileList;
-            }
-        } else {
-            return null;
-        }
-        return fileList;
-    }
+					}
+				}
+				return fileList;
+			} else if (file.isFile()) {
+				fileList.add(file.getPath());
+				return fileList;
+			}
+		} else {
+			return null;
+		}
+		return fileList;
+	}
 
     @Override
     public InputStream getPhy(String path) {

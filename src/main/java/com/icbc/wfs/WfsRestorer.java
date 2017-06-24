@@ -22,6 +22,16 @@ public class WfsRestorer {
 
 	public static void doRestore() {
 
+		
+		logger.info("prepare restore");
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			logger.info("restore sleep error");
+		}
+		logger.info("do restore");
+		
+		
 		WfsGet wfsGet = (WfsGet) SpringContextHolder.getApplicationContext().getBean("wfsGet", WfsGet.class);
 
 		for (String folder : WfsEnv.HashFolders) {
@@ -32,8 +42,12 @@ public class WfsRestorer {
 			
 			try {
 				fileList = wfsGet.getPhyList(folder);
+				if(fileList==null||fileList.isEmpty()||fileList.size()==0){
+					logger.info("doRestore-->folder not exit:"+folder);
+					continue;
+				}
 			} catch (NoSuchElementException e) {
-				logger.error("doRestore-->NoSuchElementException");
+				logger.info("doRestore-->NoSuchElementException:"+folder);
 				continue;
 			}
 			
@@ -91,6 +105,7 @@ public class WfsRestorer {
 					}
 				}
 			}
+			logger.info("doRestore-->folder synchronized:"+folder);
 		}
 	}
 }
