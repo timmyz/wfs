@@ -74,4 +74,27 @@ public class WfsUtil {
         }
         return true;
     }
+
+    public static long nParseLong(String s) throws NumberFormatException {
+        if (s == null) {
+            throw new NumberFormatException("null");
+        }
+        long result = 0L;
+        int i = 0, max = s.length();
+        int digit;
+        if (max > 0) {
+            while (i < WfsEnv.PHY_DIR_LENGTH) {
+                result <<= 4;
+                if (i < max) {
+                    digit = Character.digit(s.charAt(i), 16);
+                    if (digit < 0) {
+                        throw new NumberFormatException(s);
+                    }
+                    result -= digit;
+                }
+                i++;
+            }
+        }
+        return result;
+    }
 }
