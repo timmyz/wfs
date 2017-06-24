@@ -7,7 +7,7 @@
 	<name>${project.artifactId}</name>
 
 	<packaging>war</packaging>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/timmyz/wfs.git</connection>
 		<url>scm:git:https://github.com/timmyz/wfs.git</url>
@@ -52,11 +52,6 @@
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.20.0-GA</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
-			<version>6.1.15.pre0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba</groupId>
