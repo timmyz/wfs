@@ -21,7 +21,7 @@ import com.icbc.dubbo.util.MurMurHash;
  */
 public class HashRouter implements Router {
     public static final String NAME = "hashrouter";
-    
+
     public static final String ROUTE_KEY = "routeKey";
     public static final String ROUTE_VALUE = "routeValue";
     public static final String ROUTE_FLAG = "routeFlag";
@@ -76,7 +76,7 @@ public class HashRouter implements Router {
         for (Invoker<T> invoker : invokers) {
             try {
                 if (MurMurHash.withInRange(invoker.getUrl().getParameter("group").split("-"),
-                        hashValue, routeFlag)) {
+                        hashValue, routeFlag, false)) {
                     result.add(invoker);
                 }
             } catch (Exception e) {
