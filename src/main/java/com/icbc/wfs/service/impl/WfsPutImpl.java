@@ -22,82 +22,93 @@ import com.icbc.wfs.service.WfsPut;
 
 @Service("wfsPutImpl")
 public class WfsPutImpl implements WfsPut {
-    private static Logger logger = LoggerFactory.getLogger(WfsPutImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(WfsPutImpl.class);
 
-    @Resource
-    private WfsPut wfsPut;
-    @Resource
-    private WfsEditImpl wfsEditImpl;
+	@Resource
+	private WfsPut wfsPut;
+	@Resource
+	private WfsEditImpl wfsEditImpl;
 
-    public boolean put(String path, String flag, InputStream in) {
-        File phyFile = WfsUtil.getPhyFile(path);
-        if (!phyFile.getParentFile().exists()) {
-            if (!phyFile.getParentFile().mkdirs()) {
-                logger.error("put-->mkdir false");
-                return false;
-            }
-        }
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(phyFile);
-            int n = -1;
-            byte[] b = new byte[0x2000];
-            while (-1 != (n = in.read(b))) {
-                out.write(b, 0, n);
-            }
-            out.flush();
-        } catch (Exception e) {
-            logger.error("put-->Exception");
-            return false;
-        } finally {
-            try {
-                if (null != out) {
-                    out.close();
-                }
-                if (null != in) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                logger.error("put-->close Exception", e);
-                return false;
-            }
-        }
+	public boolean put(String path, String flag, InputStream in) {
+		
+		File phyFile = WfsUtil.getPhyFile(path);
 
-        FileInputStream nextIn = null;
-        boolean ret = false;
-        try {
-            nextIn = new FileInputStream(phyFile);
-            ret = put0(path, flag, nextIn);
-        } catch (FileNotFoundException e) {
-            return false;
-        } finally {
-            try {
-                if (null != nextIn) {
-                    nextIn.close();
-                }
-            } catch (IOException e) {
-                logger.error("put-->nextIn close Exception", e);
-                return false;
-            }
-        }
-        if (!ret) {
-            phyFile.delete();
-            return false;
-        }
-        return true;
-    }
+		if (!putPhy(in, phyFile)) {
+			return false;
+		}
 
-    public boolean put0(String path, String flag, InputStream in) {
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-        flag = flag.concat(WfsEnv.GROUP_FLAG);
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
-        try {
-            return wfsPut.put(path, flag, in);
-        } catch (NoSuchElementException e) {
-            return true;
-        } catch (Exception e) {
-            logger.error("put0--> Exception", e);
-            return false;
-        }
-    }
+		FileInputStream nextIn = null;
+		boolean ret = false;
+		try {
+			nextIn = new FileInputStream(phyFile);
+			ret = put0(path, flag, nextIn);
+		} catch (FileNotFoundException e) {
+			return false;
+		} finally {
+			try {
+				if (null != nextIn) {
+					nextIn.close();
+				}
+			} catch (IOException e) {
+				logger.error("put-->nextIn close Exception", e);
+				return false;
+			}
+		}
+		if (!ret) {
+			phyFile.delete();
+			return false;
+		}
+		return true;
+	}
+
+	public static boolean putPhy(InputStream in, File phyFile) {
+		
+		if (!phyFile.getParentFile().exists()) {
+			if (!phyFile.getParentFile().mkdirs()) {
+				logger.error("put-->mkdir false");
+				return false;
+			}
+		}
+		
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(phyFile);
+			int n = -1;
+			byte[] b = new byte[0x2000];
+			while (-1 != (n = in.read(b))) {
+				out.write(b, 0, n);
+			}
+			out.flush();
+		} catch (Exception e) {
+			logger.error("put-->Exception");
+			return false;
+		} finally {
+			try {
+				if (null != out) {
+					out.close();
+				}
+				if (null != in) {
+					in.close();
+				}
+			} catch (IOException e) {
+				logger.error("put-->close Exception", e);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean put0(String path, String flag, InputStream in) {
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+		flag = flag.concat(WfsEnv.GROUP_FLAG);
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+		try {
+			return wfsPut.put(path, flag, in);
+		} catch (NoSuchElementException e) {
+			return true;
+		} catch (Exception e) {
+			logger.error("put0--> Exception", e);
+			return false;
+		}
+	}
 }
