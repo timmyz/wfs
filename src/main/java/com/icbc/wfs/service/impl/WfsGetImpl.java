@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcException;
 import com.icbc.dubbo.constant.FileType;
+import com.icbc.dubbo.util.MurMurHash;
 import com.icbc.wfs.WfsEnv;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsGet;
