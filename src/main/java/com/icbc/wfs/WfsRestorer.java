@@ -17,9 +17,9 @@ import com.icbc.wfs.service.WfsGet;
 import com.icbc.wfs.service.impl.WfsPutImpl;
 
 public class WfsRestorer {
-
+	public static final long DELAY_TIME = 8000;
+	
 	private static Logger logger = LoggerFactory.getLogger(WfsRestorer.class);
-
 	private static boolean duringRestore = false;
 
 	public static boolean isDuringRestore() {
@@ -31,16 +31,16 @@ public class WfsRestorer {
 	}
 
 	public static void doRestore() {
-		
+
 		String rootDir = System.getProperty("duringRestore");
 		if (rootDir != null) {
 			return;
 		}
-		duringRestore=true;
-		
+		duringRestore = true;
+
 		logger.info("prepare restore");
 		try {
-			Thread.sleep(8192);
+			Thread.sleep(DELAY_TIME);
 		} catch (InterruptedException e) {
 			logger.info("restore sleep error");
 		}
@@ -56,10 +56,6 @@ public class WfsRestorer {
 
 			try {
 				fileList = wfsGet.getPhyList(folder);
-				if (fileList == null || fileList.isEmpty() || fileList.size() == 0) {
-					logger.info("doRestore-->folder not exit:" + folder);
-					continue;
-				}
 			} catch (NoSuchElementException e) {
 				logger.info("doRestore-->NoSuchElementException:" + folder);
 				continue;
@@ -75,7 +71,7 @@ public class WfsRestorer {
 				String filePath = fileInfoArr[1];
 
 				// 本地物理路径=根目录+哈希
-				String localPath = WfsEnv.ROOT_DIR + folder + File.pathSeparator + filePath;
+				String localPath = WfsEnv.ROOT_DIR + folder + File.separator + filePath;
 
 				if (fileType.equals(FileType.Directory)) {
 					// 目录
@@ -98,7 +94,7 @@ public class WfsRestorer {
 					phyFileList.add(filePath);
 				}
 				for (String phyFileName : phyFileList) {
-					File phyFile = new File(WfsEnv.ROOT_DIR + folder + File.pathSeparator + phyFileName);
+					File phyFile = new File(WfsEnv.ROOT_DIR + folder + File.separator + phyFileName);
 					if (!phyFile.exists()) {
 						logger.info("doRestore.putPhy:" + phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFileName);
