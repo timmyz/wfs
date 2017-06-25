@@ -14,7 +14,6 @@ import com.icbc.dubbo.constant.FileType;
 import com.icbc.dubbo.router.HashRouter;
 import com.icbc.dubbo.util.SpringContextHolder;
 import com.icbc.wfs.service.WfsGet;
-import com.icbc.wfs.service.impl.WfsPutImpl;
 
 public class WfsRestorer {
 	public static final long DELAY_TIME = 8000;
@@ -99,7 +98,7 @@ public class WfsRestorer {
 						logger.info("doRestore.putPhy:" + phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
-						if (!WfsPutImpl.putPhy(wfsGet.getPhy(phyFileName), phyFile)) {
+						if (!WfsUtil.putPhy(wfsGet.getPhy(phyFileName), phyFile)) {
 							logger.error("doRestore.putPhy-->false");
 						}
 					}
