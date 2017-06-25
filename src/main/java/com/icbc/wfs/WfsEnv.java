@@ -18,7 +18,10 @@ public class WfsEnv {
 		if (rootDir == null) {
 			rootDir = (String) PropertyConfigurer.getContextProperty("rootDir");
 		}
-		return rootDir + (rootDir.endsWith(File.separator) ? "" : File.separator);
+		if (!rootDir.endsWith(File.separator)) {
+			rootDir += File.separator;
+		}
+		return rootDir;
 	}
 
 	private static String getGroup() {

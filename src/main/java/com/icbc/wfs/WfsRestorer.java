@@ -2,7 +2,6 @@ package com.icbc.wfs;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,11 +20,27 @@ public class WfsRestorer {
 
 	private static Logger logger = LoggerFactory.getLogger(WfsRestorer.class);
 
-	public static void doRestore() {
+	private static boolean duringRestore = false;
 
+	public static boolean isDuringRestore() {
+		return duringRestore;
+	}
+
+	public static void setDuringRestore(boolean duringRestore) {
+		WfsRestorer.duringRestore = duringRestore;
+	}
+
+	public static void doRestore() {
+		
+		String rootDir = System.getProperty("duringRestore");
+		if (rootDir != null) {
+			return;
+		}
+		duringRestore=true;
+		
 		logger.info("prepare restore");
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(8192);
 		} catch (InterruptedException e) {
 			logger.info("restore sleep error");
 		}
@@ -53,58 +68,42 @@ public class WfsRestorer {
 			List<String> phyFileList = new LinkedList<String>();
 
 			for (String fileInfo : fileList) {
-
 				String[] fileInfoArr = fileInfo.split(":");
-
 				// 文件类型
 				String fileType = fileInfoArr[0];
-
 				// 远程路径
-				String remotePath = fileInfoArr[1];
+				String filePath = fileInfoArr[1];
 
 				// 本地物理路径=根目录+哈希
-				String localPath = WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + remotePath;
+				String localPath = WfsEnv.ROOT_DIR + folder + File.pathSeparator + filePath;
 
-				try {
-					// 空文件
-					if (fileType.equals(FileType.EmptyFile)) {
-						File file = new File(localPath);
-						if (!file.exists()) {
-							file.createNewFile();
-						}
-					}
-					// 实体文件
-					else if (fileType.equals(FileType.DataFile)) {
-						phyFileList.add(remotePath);
-
-					}
+				if (fileType.equals(FileType.Directory)) {
 					// 目录
-					else if (fileType.equals(FileType.Directory)) {
-						File file = new File(localPath);
-						if (!file.exists()) {
-							file.mkdirs();
+					File file = new File(localPath);
+					if (!file.exists()) {
+						file.mkdirs();
+					}
+				} else if (fileType.equals(FileType.EmptyFile)) {
+					// 空文件
+					File file = new File(localPath);
+					if (!file.exists()) {
+						try {
+							file.createNewFile();
+						} catch (IOException e) {
+							logger.error("doRestore--> createNewFile IOException", file.getName());
 						}
 					}
-				} catch (IOException e) {
-					logger.error("doRestore-->false");
+				} else if (fileType.equals(FileType.DataFile)) {
+					// 实体文件
+					phyFileList.add(filePath);
 				}
-
-				for (String phyFilePath : phyFileList) {
-
-					File phyFile = new File(WfsEnv.ROOT_DIR + phyFilePath);
-
+				for (String phyFileName : phyFileList) {
+					File phyFile = new File(WfsEnv.ROOT_DIR + folder + File.pathSeparator + phyFileName);
 					if (!phyFile.exists()) {
-
-						String phyFileName = phyFilePath.substring((WfsUtil.PATH_SEPARATOR + folder).length());
-						
-						logger.info("doRestore.putPhy:"+phyFileName);
-						
+						logger.info("doRestore.putPhy:" + phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, phyFileName);
 						RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
-						
-						InputStream stream = wfsGet.getPhy(phyFileName);
-						
-						if (!WfsPutImpl.putPhy(stream, phyFile)) {
+						if (!WfsPutImpl.putPhy(wfsGet.getPhy(phyFileName), phyFile)) {
 							logger.error("doRestore.putPhy-->false");
 						}
 					}
@@ -112,5 +111,6 @@ public class WfsRestorer {
 			}
 			logger.info("doRestore-->folder synchronized:" + folder);
 		}
+		duringRestore = false;
 	}
 }

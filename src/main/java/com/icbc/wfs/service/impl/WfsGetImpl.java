@@ -16,110 +16,101 @@ import com.alibaba.dubbo.rpc.RpcException;
 import com.icbc.dubbo.constant.FileType;
 import com.icbc.dubbo.util.MurMurHash;
 import com.icbc.wfs.WfsEnv;
+import com.icbc.wfs.WfsRestorer;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsGet;
 
 // @Service(version = "0.0.1")
 @Service("wfsGetImpl")
 public class WfsGetImpl implements WfsGet {
-    private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
 
-    @Override
-    public InputStream get(String path) {
-        return getPhy0(WfsUtil.getPhyFile(path));
-    }
+	@Override
+	public InputStream get(String path) {
+		return getPhy0(WfsUtil.getPhyFile(path));
+	}
 
-    @Override
-    public InputStream getPhy(String path) {
-        return getPhy0(new File(WfsUtil.getPhyFilePathByHash(path)));
-    }
+	@Override
+	public InputStream getPhy(String path) {
+		return getPhy0(new File(WfsUtil.getPhyFilePathByHash(path)));
+	}
 
-    private InputStream getPhy0(File file) {
-        BufferedInputStream fin = null;
-        try {
-            fin = new BufferedInputStream(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            logger.warn("getPhy-->FileNotFoundException" + file.getName(), e);
-            throw new RpcException();
-        }
-        return fin;
-    }
+	private InputStream getPhy0(File file) {
+		if (WfsRestorer.isDuringRestore()) {
+			logger.warn("getPhy0-->isDuringRestore" + file.getName());
+			throw new RpcException();
+		}
+		BufferedInputStream fin = null;
+		try {
+			fin = new BufferedInputStream(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			logger.warn("getPhy0-->FileNotFoundException" + file.getName(), e);
+			throw new RpcException();
+		}
+		return fin;
+	}
 
-    /**
-     * 物理层实现ls命令，获取文件列表
-     */
-    @Override
-    public List<String> getList(String path) {
-        File dir = WfsUtil.getPhyFile(path);
-        if (!dir.exists() && !dir.isDirectory()) {
-            throw new RpcException();
-        }
-        List<String> fileList = new LinkedList<String>();
-        File[] fileArray = dir.listFiles();
-        for (int i = 0; i < fileArray.length; i++) {
-            fileList.add(fileArray[i].getName());
-        }
-        return fileList;
-    }
+	/**
+	 * 物理层实现ls命令，获取文件列表
+	 */
+	@Override
+	public List<String> getList(String path) {
+		if (WfsRestorer.isDuringRestore()) {
+			logger.warn("getList-->isDuringRestore" + path);
+			throw new RpcException();
+		}
 
-    /*
-     * 递归获取目录下所有文件及文件夹
-     */
-    @Override
-    public List<String> getPhyList(String path) {
+		File dir = WfsUtil.getPhyFile(path);
+		if (!dir.exists() && !dir.isDirectory()) {
+			logger.warn("getList-->not exists or is directory" + path);
+			throw new RpcException();
+		}
+		List<String> fileList = new LinkedList<String>();
+		File[] fileArray = dir.listFiles();
+		for (int i = 0; i < fileArray.length; i++) {
+			fileList.add(fileArray[i].getName());
+		}
+		return fileList;
+	}
 
-        File file = new File(WfsEnv.ROOT_DIR + WfsUtil.PATH_SEPARATOR + path);
+	/*
+	 * 递归获取目录下所有文件及文件夹
+	 */
+	@Override
+	public List<String> getPhyList(String path) {
+		if (WfsRestorer.isDuringRestore()) {
+			logger.warn("getPhyList-->isDuringRestore" + path);
+			throw new RpcException();
+		}
 
-        List<String> fileList = new LinkedList<String>();
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                File[] fileArr = file.listFiles();
-                if (fileArr == null) {
-                    return fileList;
-                }
-                for (int i = 0; i < fileArr.length; i++) {
+		List<String> fileList = new LinkedList<String>();
+		File dir = new File(WfsEnv.ROOT_DIR + path);
+		if (dir.exists() && dir.isDirectory()) {
+			File[] fileArr = dir.listFiles();
+			if (fileArr == null) {
+				return fileList;
+			}
+			for (File file : fileArr) {
+				try {
+					MurMurHash.nParseLong(file.getName());
+				} catch (NumberFormatException e) {
+					logger.error("getPhyList:" + file.getPath() + " is not valid");
+					continue;
+				}
+				fileList.add((file.isFile() ? FileType.DataFile : FileType.Directory) + ":" + file.getName());
 
-                    File fileOne = fileArr[i];
-
-                    if (fileOne.isFile()) {
-
-                        String str = FileType.EmptyFile;
-
-                        if (fileOne.length() > 0) {
-                            try {
-                                MurMurHash.nParseLong(fileOne.getName());
-                            } catch (NumberFormatException e) {
-                                logger.error(
-                                        "getPhyList:" + fileOne.getPath() + " is not valid file");
-                                continue;
-                            }
-                            str = FileType.DataFile;
-                        }
-
-                        fileList.add(
-                                str + ":" + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
-
-                    } else if (fileOne.isDirectory()) {
-
-                        fileList.add(FileType.Directory + ":"
-                                + fileOne.getPath().substring(WfsEnv.ROOT_DIR.length()));
-                        String childPath = path + WfsUtil.PATH_SEPARATOR
-                                + fileOne.getPath().substring(file.getPath().length() + 1);
-                        List<String> tmpList = getPhyList(childPath);
-                        if (tmpList != null) {
-                            fileList.addAll(tmpList);
-                        }
-
-                    }
-                }
-                return fileList;
-            } else if (file.isFile()) {
-                fileList.add(file.getPath());
-                return fileList;
-            }
-        } else {
-            return null;
-        }
-        return fileList;
-    }
+				if (file.isDirectory()) {
+					File[] subFileArr = file.listFiles();
+					if (subFileArr == null) {
+						continue;
+					}
+					for (File subFile : subFileArr) {
+						fileList.add((subFile.isFile() ? FileType.EmptyFile : FileType.Directory) + ":" + file.getName()
+								+ WfsUtil.PATH_SEPARATOR + subFile.getName());
+					}
+				}
+			}
+		}
+		return fileList;
+	}
 }
