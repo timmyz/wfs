@@ -38,7 +38,6 @@ public class WfsIOImpl implements WfsIO {
      */
     @Override
     public boolean put(String path, InputStream in) {
-
         if (!WfsUtil.isDirectory(path)) {
             RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
             if (!wfsPut.put(path, "", in)) {
@@ -46,7 +45,6 @@ public class WfsIOImpl implements WfsIO {
                 return false;
             }
         }
-
         if (!WfsUtil.mergerFalse(wfsEditImpl.put0(path))) {
             wfsEdit.del(path);
         }
@@ -55,15 +53,8 @@ public class WfsIOImpl implements WfsIO {
 
     @Override
     public InputStream get(String path) {
-        InputStream in = null;
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-        logger.info("WfsIOImpl-->get " + path);
-        try {
-            in = wfsGet.get(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return in;
+        return wfsGet.get(path);
     }
 
     @Override

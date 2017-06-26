@@ -19,15 +19,6 @@ public class WfsRestorer implements Runnable {
     public static final long DELAY_TIME = 8000;
 
     private static Logger logger = LoggerFactory.getLogger(WfsRestorer.class);
-    private static boolean duringRestore = false;
-
-    public static boolean isDuringRestore() {
-        return duringRestore;
-    }
-
-    public static void setDuringRestore(boolean duringRestore) {
-        WfsRestorer.duringRestore = duringRestore;
-    }
 
     @Override
     public void run() {
@@ -35,7 +26,6 @@ public class WfsRestorer implements Runnable {
         if (rootDir != null) {
             return;
         }
-        duringRestore = true;
 
         logger.info("prepare restore");
         try {
@@ -61,6 +51,9 @@ public class WfsRestorer implements Runnable {
                 continue;
             } catch (RpcException e) {
                 logger.warn("provider is during too!", e);
+                continue;
+            } catch (Exception e) {
+                logger.warn("skip folder", e);
                 continue;
             }
 
@@ -107,7 +100,6 @@ public class WfsRestorer implements Runnable {
             }
             logger.info("doRestore-->folder synchronized:" + folder);
         }
-        duringRestore = false;
         logger.info("done restore");
     }
 }

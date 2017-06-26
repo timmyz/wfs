@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcException;
 import com.icbc.wfs.WfsEnv;
-import com.icbc.wfs.WfsRestorer;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsGet;
 
@@ -34,10 +33,6 @@ public class WfsGetImpl implements WfsGet {
     }
 
     private InputStream getPhy0(File file) {
-        if (WfsRestorer.isDuringRestore()) {
-            logger.warn("getPhy0-->isDuringRestore" + file.getName());
-            throw new RpcException(RpcException.FORBIDDEN_EXCEPTION);
-        }
         BufferedInputStream fin = null;
         try {
             fin = new BufferedInputStream(new FileInputStream(file));
@@ -54,11 +49,6 @@ public class WfsGetImpl implements WfsGet {
      */
     @Override
     public List<String> getList(String path) {
-        if (WfsRestorer.isDuringRestore()) {
-            logger.warn("getList-->isDuringRestore" + path);
-            throw new RpcException(RpcException.FORBIDDEN_EXCEPTION);
-        }
-
         File dir = WfsUtil.getPhyFile(path);
         if (!dir.exists() && !dir.isDirectory()) {
             logger.warn("getList-->not exists or is directory" + path);
@@ -77,11 +67,6 @@ public class WfsGetImpl implements WfsGet {
      */
     @Override
     public List<String> getPhyList(String path) {
-        if (WfsRestorer.isDuringRestore()) {
-            logger.warn("getPhyList-->isDuringRestore" + path);
-            throw new RpcException();
-        }
-
         List<String> fileList = new LinkedList<String>();
         File dir = new File(WfsEnv.ROOT_DIR + path);
         if (dir.exists() && dir.isDirectory()) {

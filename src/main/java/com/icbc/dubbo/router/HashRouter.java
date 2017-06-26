@@ -86,6 +86,11 @@ public class HashRouter implements Router {
             return false;
         }
     }
+    
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 
     @Override
     public URL getUrl() {
