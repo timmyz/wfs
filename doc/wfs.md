@@ -8,9 +8,19 @@
 
 提供文件存储接口，支持存放文件、获取文件、获取目录、删除文件、重命名文件等服务化接口
 
+### 特别说明
+
+根据 dubbo 文档的描述，dubbo 协议并不适合文件传输场景，下引用自 dubbo 文档：
+
+- 适用范围：传入传出参数数据包较小（建议小于100K），消费者比提供者个数多，单一消费者无法压满提供者，尽量不要用dubbo协议传输大文件或超大字符串。
+
+因此根据 dubbo 官方文档的建议，本项目采用 hessian 作为服务化协议。
+
+又由于研发支持的 DSF 框架将 hessian 协议作了精简，经过与主办方沟通，我们基于含有 Hessian 协议的官方 dubbo 版本，建议使用 dubbo-2.5.3.jar。
+
 ### 服务配置
 
-消费者方在dubbo.xml中配置引用服务信息，因需要使用Hessian协议的dubbo版本，建议使用dubbo-2.5.3.jar
+消费者方在dubbo.xml中配置引用服务信息
 
 ```xml
 <dubbo:reference id="wfsIO" interface="com.icbc.wfs.service.WfsIO" version="0.0.1" check="false" />

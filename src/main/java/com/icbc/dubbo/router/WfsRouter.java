@@ -103,7 +103,8 @@ public class WfsRouter implements Router {
     
     @Override
     public int hashCode() {
-        return super.hashCode();
+    	int h = super.hashCode();
+    	return h;
     }
 
     @Override

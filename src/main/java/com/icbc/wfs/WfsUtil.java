@@ -79,20 +79,34 @@ public class WfsUtil {
 
 	public static boolean putPhy(InputStream in, File phyFile) {
 		if (!phyFile.getParentFile().exists()) {
+			logger.debug("parent not exists");
 			if (!phyFile.getParentFile().mkdirs()) {
 				logger.error("putPhy-->mkdir false");
 				return false;
 			}
 		}
 		OutputStream out = null;
+		boolean tooLarge = false;
 		try {
 			out = new BufferedOutputStream(new FileOutputStream(phyFile));
 			int n = -1;
+			int totalLen = 0;
 			byte[] b = new byte[0x2000];
 			while (-1 != (n = in.read(b))) {
+				totalLen += n;
+				if (totalLen > 100 * 1024 * 1024) {
+					tooLarge = true;
+					break;
+				}
 				out.write(b, 0, n);
 			}
 			out.flush();
+			if (tooLarge) {
+				if (phyFile != null && phyFile.delete()) {
+					logger.debug("too large, delete it");
+				}
+				return false;
+			}
 		} catch (IOException e) {
 			logger.error("putPhy-->IOException", e);
 			return false;
@@ -106,7 +120,6 @@ public class WfsUtil {
 				}
 			} catch (IOException e) {
 				logger.error("putPhy-->close IOException", e);
-				return false;
 			}
 		}
 		return true;
@@ -135,10 +148,8 @@ public class WfsUtil {
 					}
 				}
 			}
-		} else {
-			while (targetFile.exists()) {
-				return targetFile.delete();
-			}
+		} else if (targetFile.exists()) {
+			return targetFile.delete();
 		}
 		return true;
 	}

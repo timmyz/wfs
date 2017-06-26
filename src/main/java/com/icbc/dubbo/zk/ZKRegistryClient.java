@@ -168,6 +168,7 @@ public class ZKRegistryClient implements InitializingBean {
     }
 
     private String getParentPath(String category, String serviceInterface, String version) {
+    	LOGGER.debug(version);
         return "/dubbo/" + serviceInterface + "/" + category;
     }
 
