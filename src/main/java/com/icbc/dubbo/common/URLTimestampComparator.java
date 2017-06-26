@@ -8,13 +8,18 @@
  *********************************************/
 package com.icbc.dubbo.common;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 
-public class URLTimestampComparator implements Comparator<URL>{
+public class URLTimestampComparator implements Comparator<URL>, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7208016428461264960L;
 	private boolean asc;
 	
 	public URLTimestampComparator(boolean asc){

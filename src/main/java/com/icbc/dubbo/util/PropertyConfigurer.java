@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 public class PropertyConfigurer extends PropertyPlaceholderConfigurer {  
 	  
-    private static Map<String, Object> ctxPropertiesMap;  
+    private static final Map<String, Object> ctxPropertiesMap = new HashMap<String, Object>();  
   
     @Override  
     protected void processProperties(ConfigurableListableBeanFactory beanFactory,  
@@ -18,7 +18,6 @@ public class PropertyConfigurer extends PropertyPlaceholderConfigurer {
   
         super.processProperties(beanFactory, props);  
         //load properties to ctxPropertiesMap  
-        ctxPropertiesMap = new HashMap<String, Object>();  
         for (Object key : props.keySet()) {  
             String keyStr = key.toString();  
             String value = props.getProperty(keyStr);  

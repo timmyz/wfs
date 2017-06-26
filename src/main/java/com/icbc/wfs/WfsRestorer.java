@@ -42,11 +42,11 @@ public class WfsRestorer implements Runnable {
 
             RpcContext.getContext().setAttachment(HashRouter.ROUTE_VALUE, folder);
             RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, WfsEnv.GROUP_FLAG);
-            List<String> fileList = new LinkedList<String>();
+            List<String> fileList = null;
 
             try {
                 fileList = wfsGet.getPhyList(folder);
-                System.out.println(fileList);
+                logger.debug("fileList: " + fileList);
             } catch (NoSuchElementException e) {
                 continue;
             } catch (RpcException e) {
@@ -66,7 +66,9 @@ public class WfsRestorer implements Runnable {
                         WfsUtil.delete(dir);
                     }
                     if (!dir.exists()) {
-                        dir.mkdirs();
+                        if(!dir.mkdirs()){
+                        	logger.error("failed to mkdirs");
+                        }
                     }
                 } else {
                     File file = new File(WfsEnv.ROOT_DIR + folder + File.separator + path);
@@ -85,7 +87,9 @@ public class WfsRestorer implements Runnable {
                     File phyFile =
                             new File(WfsEnv.ROOT_DIR + folder + File.separator + phyFileName);
                     if (phyFile.exists()) {
-                        phyFile.delete();
+                        if(!phyFile.delete()){
+                        	logger.error("failed to delete");
+                        }
                     }
                     if (!phyFile.exists()) {
                         logger.info("doRestore.putPhy:" + phyFileName);

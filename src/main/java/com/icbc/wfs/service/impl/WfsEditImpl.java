@@ -55,7 +55,9 @@ public class WfsEditImpl implements WfsEdit {
                     return new boolean[] {false};
                 }
             }
-            vFolder.mkdirs();
+            if(!vFolder.mkdirs()){
+            	logger.error("failed to mkdirs");
+            }
         }
         // 创建假文件，HASH路径+真文件名
         File vFile = new File(WfsUtil.getPhyFilePath(dir) + WfsUtil.PATH_SEPARATOR + fileName);

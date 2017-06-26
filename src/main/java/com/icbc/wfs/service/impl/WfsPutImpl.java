@@ -65,7 +65,9 @@ public class WfsPutImpl implements WfsPut {
 			}
 		}
 		if (!ret) {
-			phyFile.delete();
+			if(phyFile.delete()){
+            	logger.error("failed to delete");	
+			}
 			return false;
 		}
 		return true;
