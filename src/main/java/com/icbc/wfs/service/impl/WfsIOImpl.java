@@ -36,40 +36,49 @@ public class WfsIOImpl implements WfsIO {
 	/**
 	 * 存放文件
 	 * 
-	 * @param path 虚拟路径
-	 * @param in 文件流
+	 * @param path
+	 *            虚拟路径
+	 * @param in
+	 *            文件流
 	 * @return 成功失败
 	 */
 	@Override
 	public boolean put(String path, InputStream in) {
 
 		if (WfsUtil.isEmptyString(path)) {
-			return false;
+			throw new RuntimeException("虚拟路径为空");
+		}
+
+		if (in == null) {
+			throw new RuntimeException("文件流为空");
 		}
 
 		if (!WfsUtil.isDirectory(path)) {
 			RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 			if (!wfsPut.put(path, "", in)) {
 				logger.error("put-->false");
-				return false;
+				throw new RuntimeException("存放失败[1]");
 			}
 		}
 		if (!WfsUtil.mergerFalse(wfsEditImpl.put0(path))) {
 			wfsEdit.del(path);
+			throw new RuntimeException("存放失败[2]");
 		}
 		return true;
 	}
 
 	/**
 	 * 获取文件
-	 * @param path 虚拟路径
+	 * 
+	 * @param path
+	 *            虚拟路径
 	 * @return 文件流
 	 */
 	@Override
 	public InputStream get(String path) {
 
 		if (WfsUtil.isEmptyString(path)) {
-			return null;
+			throw new RuntimeException("虚拟路径为空");
 		}
 
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
@@ -78,74 +87,91 @@ public class WfsIOImpl implements WfsIO {
 
 	/**
 	 * 重命名文件
-	 * @param newPath 新虚拟路径
-	 * @param oldPath 原虚拟路径
+	 * 
+	 * @param newPath
+	 *            新虚拟路径
+	 * @param oldPath
+	 *            原虚拟路径
 	 * @return 成功失败
 	 */
 	@Override
 	public boolean ren(String newPath, String oldPath) {
-		//新虚拟路径为空
+
+		// 新虚拟路径为空
 		if (WfsUtil.isEmptyString(newPath)) {
-			return false;
+			throw new RuntimeException("新虚拟路径为空");
 		}
-		//原虚拟路径为空
+		// 原虚拟路径为空
 		if (WfsUtil.isEmptyString(oldPath)) {
-			return false;
+			throw new RuntimeException("原虚拟路径为空");
 		}
-		//新虚拟路径=原虚拟路径
+		// 新虚拟路径=原虚拟路径
 		if (newPath.equals(oldPath)) {
-			return false;
+			throw new RuntimeException("新虚拟路径不能等于原虚拟路径");
 		}
 
 		if (!put(newPath, get(oldPath))) {
-			return false;
+			throw new RuntimeException("重命名文件失败[1]");
 		}
 		if (!del(oldPath)) {
-			return false;
+			throw new RuntimeException("重命名文件失败[2]");
 		}
 		return true;
 	}
 
 	/**
 	 * 删除文件
-	 * @param path 虚拟路径
+	 * 
+	 * @param path
+	 *            虚拟路径
 	 * @return 成功失败
 	 */
 	@Override
 	public boolean del(String path) {
 
-		//虚拟路径为空
+		// 虚拟路径为空
 		if (WfsUtil.isEmptyString(path)) {
-			return false;
+			throw new RuntimeException("虚拟路径为空");
 		}
 
-		//虚拟路径为目录
+		// 虚拟路径为目录
 		if (WfsUtil.isDirectory(path)) {
-			return false;
+			throw new RuntimeException("虚拟路径为目录");
 		}
-		
+
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
 
 		String directory = WfsUtil.getParent(path);
-		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
 		String fileName = WfsUtil.getFileName(path);
+
+		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
+
 		if (!WfsUtil.mergerFalse(wfsEdit.delDir(directory, fileName))) {
-			return false;
+			throw new RuntimeException("删除失败[1]");
 		}
+
 		RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-		return WfsUtil.mergerFalse(wfsEdit.del(path));
+
+		if (!WfsUtil.mergerFalse(wfsEdit.del(path))) {
+			throw new RuntimeException("删除失败[2]");
+		}
+
+		return true;
 	}
 
 	/**
 	 * 获取目录
-	 * @param path 虚拟路径
+	 * 
+	 * @param path
+	 *            虚拟路径
 	 * @return 文件列表
 	 */
 	@Override
 	public List<String> list(String path) {
 
+		// 虚拟路径为空
 		if (WfsUtil.isEmptyString(path)) {
-			return null;
+			throw new RuntimeException("虚拟路径为空");
 		}
 
 		List<String> list = new LinkedList<String>();
