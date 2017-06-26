@@ -25,8 +25,6 @@ public class WfsPutImpl implements WfsPut {
 
 	@Resource
 	private WfsPut wfsPut;
-	@Resource
-	private WfsEditImpl wfsEditImpl;
 
 	public boolean put(String path, String flag, InputStream in) {
 
