@@ -43,15 +43,72 @@ private WfsIO wfsIO;
 | del  | 删除文件  |
 | list | 获取目录  |
 
+```java
+package com.icbc.wfs.service;
+
+import java.io.InputStream;
+import java.util.List;
+
+public interface WfsIO {
+	
+	/**
+	 * 存放文件
+	 * @param path 虚拟路径
+	 * @param in 文件流
+	 * @return 成功失败
+	 */
+	boolean put(String path, InputStream in);
+
+	/**
+	 * 获取文件
+	 * @param path 文件流
+	 * @return 文件流
+	 */
+	InputStream get(String path);
+	
+	/**
+	 * 重命名文件
+	 * @param newPath
+	 * @param oldPath
+	 * @return 成功失败
+	 */
+	boolean ren(String newPath, String oldPath);
+	
+	/**
+	 * 删除文件
+	 * @param path 虚拟路径
+	 * @return 成功失败
+	 */
+	boolean del(String path);
+	
+	/**
+	 * 获取目录
+	 * @param path 虚拟路径
+	 * @return 文件列表
+	 */
+	List<String> list(String path);
+}
+```
+
 #### PUT
+###### 输入
 
 | 参数类型   | 参数名  | 参数说明 | 示例值                                      |
 | ------ | ---- | ---- | ---------------------------------------- |
 | String | path | 虚拟路径 | "/remoteDir/remoteFile.jpg"              |
 | String | in   | 文件流  | new FileInputStream("/localDir/localFile.jpg") |
+###### 输出
+
+​	boolean 成功或失败
+
+###### 异常
+如果 path  虚拟路径 为空，则抛出运行时异常"虚拟路径为空"
+如果 in  文件流 为空，则抛出运行时异常"文件流为空"
+
+###### 代码示例
 ```java
 /** 存放文件 */
-public void put() throws Exception {
+public void put() {
   // 虚拟路径
   String remotePath = "/remoteDir/remoteFile.jpg";
   // 本地文件
@@ -61,14 +118,22 @@ public void put() throws Exception {
 ```
 
 #### GET
+###### 输入
 
 | 参数类型   | 参数名  | 参数说明 | 示例值                         |
 | ------ | ---- | ---- | --------------------------- |
 | String | path | 虚拟路径 | "/remoteDir/remoteFile.jpg" |
+###### 输出
 
+​	InputStream 文件流
+
+###### 异常
+如果 path  虚拟路径 为空，则抛出运行时异常"虚拟路径为空"
+
+###### 代码示例
 ```java
 /** 获取文件 */
-public void get() throws Exception {
+public void get() {
   // 虚拟路径
   String remotePath = "/remoteDir/remoteFile.jpg";
   InputStream stream = wfsIO.get(remotePath);
@@ -76,15 +141,25 @@ public void get() throws Exception {
 ```
 
 #### REN
+###### 输入
 
 | 参数类型   | 参数名     | 参数说明  | 示例值                         |
 | ------ | ------- | ----- | --------------------------- |
 | String | newPath | 新虚拟路径 | "/remoteDir/remoteFile.jpg" |
 | String | oldPath | 原虚拟路径 | "/newDir/remoteFile.jpg"    |
 
+###### 输出
+​	boolean 成功或失败
+
+###### 异常
+如果 newPath  新虚拟路径 为空，则抛出运行时异常"新虚拟路径为空"
+如果 oldPath  新虚拟路径 为空，则抛出运行时异常"原虚拟路径为空"
+如果 newPath  新虚拟路径 == oldPath  新虚拟路径，则抛出运行时异常"新虚拟路径不能等于原虚拟路径"
+
+###### 代码示例
 ```java
 /** 重命名文件 */
-public void rename() throws Exception {
+public void rename() {
   // 原虚拟路径
   String prePath = "/remoteDir/remoteFile.jpg";
   // 新虚拟路径
@@ -93,13 +168,21 @@ public void rename() throws Exception {
 }
 ```
 #### DEL
+###### 输入
 
 | 参数类型   | 参数名  | 参数说明 | 示例值                         |
 | ------ | ---- | ---- | --------------------------- |
 | String | path | 虚拟路径 | "/remoteDir/remoteFile.jpg" |
+###### 输出
+​	boolean 成功或失败
+
+###### 异常
+如果 path  虚拟路径 为空，则抛出运行时异常"虚拟路径为空"
+
+###### 代码示例
 ```java
 /** 删除文件 */
-public void delete() throws Exception {
+public void delete() {
   // 虚拟路径
   String remotePath = "/remoteDir/remoteFile.jpg";
   boolean isSucc = wfsIO.del(remotePath);
@@ -107,13 +190,25 @@ public void delete() throws Exception {
 ```
 
 #### LIST
+###### 输入
 
 | 参数类型   | 参数名  | 参数说明 | 示例值           |
 | ------ | ---- | ---- | ------------- |
 | String | path | 虚拟路径 | "/remoteDir/" |
+
+###### 输出
+​	List<String>为文件列表，不包含下级目录，如
+​		remoteFile1.jpg
+​		remoteFile2.jpg
+​		remoteDir/
+
+###### 异常
+如果 path  虚拟路径 为空，则抛出运行时异常"虚拟路径为空"
+
+###### 代码示例
 ```java
 /** 获取目录 */
-public void list() throws Exception {
+public void list() {
   // 虚拟路径
   String remoteDir = "/remoteDir/";
   List<String> fileList = wfsIO.list(remoteDir);
