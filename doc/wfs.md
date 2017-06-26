@@ -2,7 +2,7 @@
 
 ### 功能概述
 
-本服务提供分布式文件存储的功能
+本服务提供服务化分布式文件系统功能
 
 ### 场景介绍
 
@@ -69,8 +69,8 @@ public void get() throws Exception {
 
 | 参数类型   | 参数名     | 参数说明  | 示例值                         |
 | ------ | ------- | ----- | --------------------------- |
-| String | newPath | 原虚拟路径 | "/remoteDir/remoteFile.jpg" |
-| String | oldPath | 新虚拟路径 | "/newDir/remoteFile.jpg"    |
+| String | newPath | 新虚拟路径 | "/remoteDir/remoteFile.jpg" |
+| String | oldPath | 原虚拟路径 | "/newDir/remoteFile.jpg"    |
 
 ```java
 /** 重命名文件 */

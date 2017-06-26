@@ -22,6 +22,16 @@ public class WfsUtil {
 		return path.endsWith(PATH_SEPARATOR);
 	}
 
+	public static boolean isEmptyString(String str) {
+
+		if (str == null || str.isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
 	public static String getFileName(String path) {
 		if (ROOT.equals(path)) {
 			return ROOT;
