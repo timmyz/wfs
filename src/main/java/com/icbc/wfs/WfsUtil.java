@@ -94,7 +94,7 @@ public class WfsUtil {
 			byte[] b = new byte[0x2000];
 			while (-1 != (n = in.read(b))) {
 				totalLen += n;
-				if (totalLen > 100 * 1024 * 1024) {
+				if (totalLen > WfsEnv.MAX_FILE_LENGTH) {
 					tooLarge = true;
 					break;
 				}
@@ -102,7 +102,7 @@ public class WfsUtil {
 			}
 			out.flush();
 			if (tooLarge) {
-				if (phyFile != null && phyFile.delete()) {
+				if (phyFile.delete()) {
 					logger.debug("too large, delete it");
 				}
 				return false;
