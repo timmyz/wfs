@@ -25,6 +25,7 @@ public class WfsEditImpl implements WfsEdit {
     public boolean[] del(String path) {
         File phyFile = WfsUtil.getPhyFile(path);
         if (phyFile.exists()) {
+        	logger.debug("phyFile exists");
             if (!phyFile.delete()) {
                 logger.error("del--> delete" + phyFile.getName());
                 return new boolean[] {false};
@@ -50,6 +51,7 @@ public class WfsEditImpl implements WfsEdit {
         if (!vFolder.exists()) {
             // 如果虚拟路径不等于根路径，则递归创建上级目录
             if (!WfsUtil.ROOT.equals(dir)) {
+            	logger.debug("ROOT not equals dir");
                 if (!WfsUtil.mergerFalse(put0(dir))) {
                     logger.error("put--> put0");
                     return new boolean[] {false};
@@ -87,6 +89,7 @@ public class WfsEditImpl implements WfsEdit {
         if (dirPhyFile.exists() && dirPhyFile.isDirectory()) {
             File phyFile = new File(dirPhyFile.getAbsolutePath() + File.separator + fileName);
             if (phyFile.exists()) {
+            	logger.debug("phyFile exists");
                 if (!phyFile.delete()) {
                     logger.error("del-->delete" + phyFile.getName());
                     return new boolean[] {false};

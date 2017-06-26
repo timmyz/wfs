@@ -12,6 +12,7 @@ public class WfsEnv {
 	public static final List<String> HashFolders = getHashFolders();
 	public static final String GROUP_FLAG = getGroupFlag();
 	public static final int PHY_DIR_LENGTH = 2;
+	public static final int MAX_FILE_LENGTH = getMaxFileLength();
 
 	private static String getRootDir() {
 		String rootDir = System.getProperty("rootDir");
@@ -22,6 +23,18 @@ public class WfsEnv {
 			rootDir += File.separator;
 		}
 		return rootDir;
+	}
+
+	private static int getMaxFileLength() {
+		String max = System.getProperty("maxFileLength");
+		if (max == null) {
+			max = (String) PropertyConfigurer.getContextProperty("maxFileLength");
+		}
+		if (max != null) {
+			return Integer.parseInt(max);
+		} else {
+			return 512 * 1024 * 1024;
+		}
 	}
 
 	private static String getGroup() {
