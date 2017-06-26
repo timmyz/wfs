@@ -200,7 +200,7 @@ public void delete() {
 ​	List<String>为文件列表，不包含下级目录，如
 ​		remoteFile1.jpg
 ​		remoteFile2.jpg
-​		remoteDir/
+​		subDir/
 
 ###### 异常
 如果 path  虚拟路径 为空，则抛出运行时异常"虚拟路径为空"
