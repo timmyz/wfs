@@ -29,9 +29,9 @@ public class WfsIOTest {
 				try {
 					String path = "/ab/cd/ef";
 					in = new FileInputStream(inputPath);
-					if (wfsIO.put(path, in)) {
+					if (true) {
+				//  if (wfsIO.put(path, in)) {
 						System.out.println("put done");
-
 						InputStream getIn = wfsIO.get(path);
 						FileOutputStream out = null;
 						try {
@@ -50,12 +50,13 @@ public class WfsIOTest {
 								getIn.close();
 							}
 						}
-
+						/*
 						if (wfsIO.del(path)) {
 							System.out.println("del  done");
 						} else {
 							System.out.println("del  oops");
 						}
+						*/
 					} else {
 						System.out.println("put oops~");
 					}

@@ -3,11 +3,13 @@ package com.icbc.wfs.service.impl;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.icbc.dubbo.router.WfsRouter;
 import com.icbc.wfs.WfsUtil;
@@ -53,8 +55,15 @@ public class WfsIOImpl implements WfsIO {
 
     @Override
     public InputStream get(String path) {
+        InputStream in = null;
         RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-        return wfsGet.get(path);
+        logger.info("WfsIOImpl-->get " + path);
+        try {
+            in = wfsGet.get(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return in;
     }
 
     @Override
