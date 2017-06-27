@@ -21,53 +21,48 @@ import com.icbc.wfs.service.WfsPut;
 
 @Service("wfsPutImpl")
 public class WfsPutImpl implements WfsPut {
-	private static Logger logger = LoggerFactory.getLogger(WfsPutImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(WfsPutImpl.class);
 
-	@Resource
-	private WfsPut wfsPut;
+    @Resource
+    private WfsPut wfsPut;
 
-	public boolean put(String path, String flag, InputStream in) {
+    public boolean put(String path, String flag, InputStream in) {
 
-		File phyFile = WfsUtil.getPhyFile(path);
+        File phyFile = WfsUtil.getPhyFile(path);
 
-		if (!WfsUtil.putPhy(in, phyFile)) {
-			return false;
-		}
+        if (!WfsUtil.putPhy(in, phyFile)) {
+            return false;
+        }
 
-		boolean ret = false;
-		FileInputStream fin = null;
-		BufferedInputStream nextIn = null;
-		try {
-			fin = new FileInputStream(phyFile);
-			nextIn = new BufferedInputStream(fin);
-			RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-			flag = flag.concat(WfsEnv.GROUP_FLAG);
-			RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
-			ret = wfsPut.put(path, flag, nextIn);
-		} catch (NoSuchElementException e) {
-			ret = true;
-		} catch (IOException e) {
-			logger.error("put-->IOException", e);
-			ret = false;
-		} finally {
-			try {
-				if (null != nextIn) {
-					nextIn.close();
-				}
-				if (null != fin) {
-					fin.close();
-				}
-			} catch (IOException e) {
-				logger.error("put--> close IOException", e);
-				ret = false;
-			}
-		}
-		if (!ret) {
-			if(phyFile.delete()){
-            	logger.error("failed to delete");	
-			}
-			return false;
-		}
-		return true;
-	}
+        boolean ret = false;
+        BufferedInputStream nextIn = null;
+        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+        flag = flag.concat(WfsEnv.GROUP_FLAG);
+        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+        try {
+            nextIn = new BufferedInputStream(new FileInputStream(phyFile));
+            ret = wfsPut.put(path, flag, nextIn);
+        } catch (NoSuchElementException e) {
+            ret = true;
+        } catch (IOException e) {
+            logger.error("put-->IOException", e);
+            ret = false;
+        } finally {
+            try {
+                if (null != nextIn) {
+                    nextIn.close();
+                }
+            } catch (IOException e) {
+                logger.error("put--> close IOException", e);
+                ret = false;
+            }
+        }
+        if (!ret) {
+            if (phyFile.delete()) {
+                logger.error("failed to delete");
+            }
+            return false;
+        }
+        return true;
+    }
 }

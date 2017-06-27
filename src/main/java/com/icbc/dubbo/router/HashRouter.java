@@ -10,7 +10,6 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.cluster.Router;
 import com.icbc.dubbo.util.MurMurHash;
 
 /**
@@ -19,7 +18,7 @@ import com.icbc.dubbo.util.MurMurHash;
  * @author kfzx-wuzd
  * 
  */
-public class HashRouter implements Router {
+public class HashRouter extends AbsRouter {
     public static final String NAME = "hashrouter";
 
     public static final String ROUTE_KEY = "routeKey";
@@ -28,10 +27,8 @@ public class HashRouter implements Router {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HashRouter.class);
 
-    private URL routerUrl;
-
     public HashRouter(URL routerUrl) {
-        this.routerUrl = routerUrl;
+        super(routerUrl);
     }
 
     @Override
@@ -70,31 +67,4 @@ public class HashRouter implements Router {
         return result;
     }
 
-    @Override
-    public int compareTo(Router o) {
-        if (routerUrl == null || o.getUrl() == null) {
-            return -1;
-        }
-        return routerUrl.toFullString().compareTo(o.getUrl().toFullString());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Router) {
-            return compareTo((Router) o) == 0;
-        } else {
-            return false;
-        }
-    }
-    
-    @Override
-    public int hashCode() {
-    	int h = super.hashCode();
-    	return h;
-    }
-
-    @Override
-    public URL getUrl() {
-        return routerUrl;
-    }
 }

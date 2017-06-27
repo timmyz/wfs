@@ -7,13 +7,18 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.RpcContext;
+import com.icbc.dubbo.router.WfsRouter;
 import com.icbc.wfs.WfsEnv;
+import com.icbc.wfs.WfsRestorer;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsGet;
 
@@ -22,56 +27,97 @@ import com.icbc.wfs.service.WfsGet;
 public class WfsGetImpl implements WfsGet {
     private static Logger logger = LoggerFactory.getLogger(WfsGetImpl.class);
 
-    @Override
-    public InputStream get(String path) {
-        return getPhy0(WfsUtil.getPhyFile(path));
-    }
+    @Resource
+    private WfsGet wfsGet;
 
-    @Override
-    public InputStream getPhy(String path) {
-        return getPhy0(new File(WfsUtil.getPhyFilePathByHash(path)));
-    }
-
-    private InputStream getPhy0(File file) {
+    private InputStream getPhy0(File file) throws FileNotFoundException {
         BufferedInputStream fin = null;
         try {
             fin = new BufferedInputStream(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             logger.warn("getPhy0-->FileNotFoundException" + file.getName(), e);
-            throw new RpcException(RpcException.FORBIDDEN_EXCEPTION,
-                    "FileNotFoundException" + file.getName(), e);
+            throw e;
         }
         return fin;
     }
 
-    /**
-     * 物理层实现ls命令，获取文件列表
-     */
     @Override
-    public List<String> getList(String path) {
-        File dir = WfsUtil.getPhyFile(path);
-        if (!dir.exists() && !dir.isDirectory()) {
-            logger.warn("getList-->not exists or is directory" + path);
-            throw new RpcException(RpcException.FORBIDDEN_EXCEPTION);
-        }
-        List<String> fileList = new LinkedList<String>();
-        File[] fileArray = dir.listFiles();
-        if (fileArray != null) {
-            for (File file : fileArray) {
-                fileList.add(WfsUtil.getName(file));
+    public InputStream get(String path, String flag) throws FileNotFoundException {
+        try {
+            if (WfsRestorer.isDURING()) {
+                throw new FileNotFoundException(path);
+            }
+            return getPhy0(WfsUtil.getPhyFile(path));
+        } catch (FileNotFoundException e) {
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            flag = flag.concat(WfsEnv.GROUP_FLAG);
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            try {
+                return wfsGet.get(path, flag);
+            } catch (NoSuchElementException e1) {
+                throw e;
             }
         }
-        return fileList;
     }
 
-    /*
-     * 递归获取目录下所有文件及文件夹
+    /**
+     * 获取目录文件列表
+     * 
+     * @throws FileNotFoundException
      */
     @Override
-    public List<String> getPhyList(String path) {
-        List<String> fileList = new LinkedList<String>();
+    public List<String> getList(String path, String flag) throws FileNotFoundException {
+        File dir = WfsUtil.getPhyFile(path);
+        if (!WfsRestorer.isDURING() && dir.exists() && dir.isDirectory()) {
+            List<String> fileList = new LinkedList<String>();
+            File[] fileArray = dir.listFiles();
+            if (fileArray != null) {
+                for (File file : fileArray) {
+                    fileList.add(WfsUtil.getName(file));
+                }
+            }
+            return fileList;
+        } else {
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            flag = flag.concat(WfsEnv.GROUP_FLAG);
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            try {
+                return wfsGet.getList(path, flag);
+            } catch (NoSuchElementException e1) {
+                throw new FileNotFoundException();
+            }
+        }
+    }
+
+    @Override
+    public InputStream getPhy(String path, String flag) {
+        try {
+            if (WfsRestorer.isDURING()) {
+                throw new FileNotFoundException(path);
+            }
+            return getPhy0(new File(WfsUtil.getPhyFilePathByHash(path)));
+        } catch (FileNotFoundException e) {
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            flag = flag.concat(WfsEnv.GROUP_FLAG);
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            try {
+                return wfsGet.getPhy(path, flag);
+            } catch (NoSuchElementException e1) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 获取目录下所有文件及文件夹
+     * 
+     * @throws FileNotFoundException
+     */
+    @Override
+    public List<String> getPhyList(String path, String flag) {
         File dir = new File(WfsEnv.ROOT_DIR + path);
-        if (dir.exists() && dir.isDirectory()) {
+        if (!WfsRestorer.isDURING() && dir.exists() && dir.isDirectory()) {
+            List<String> fileList = new LinkedList<String>();
             File[] fileArr = dir.listFiles();
             if (fileArr == null) {
                 return fileList;
@@ -94,7 +140,16 @@ public class WfsGetImpl implements WfsGet {
                     }
                 }
             }
+            return fileList;
+        } else {
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            flag = flag.concat(WfsEnv.GROUP_FLAG);
+            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            try {
+                return wfsGet.getPhyList(path, flag);
+            } catch (NoSuchElementException e1) {
+                return null;
+            }
         }
-        return fileList;
     }
 }
