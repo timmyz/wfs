@@ -59,7 +59,7 @@ public class WfsRestorer implements Runnable {
                 continue;
             }
             if (null == fileList) {
-                logger.warn("doRestore-->all provider during too!" + folder);
+                logger.info("doRestore-->null fileList " + folder);
                 continue;
             }
 

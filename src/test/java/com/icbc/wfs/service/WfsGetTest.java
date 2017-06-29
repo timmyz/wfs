@@ -10,7 +10,7 @@ public class WfsGetTest {
         ClassPathXmlApplicationContext context =
                 new ClassPathXmlApplicationContext("applicationContext_test.xml");
         WfsGet wfsGet = context.getBean(WfsGet.class);
-        List<String> list = wfsGet.getPhyList("ab", "");
+        List<String> list = wfsGet.getPhyList("62", "");
         for (String s : list) {
             System.out.println(s);
         }
