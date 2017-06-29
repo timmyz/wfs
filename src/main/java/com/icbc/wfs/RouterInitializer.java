@@ -1,4 +1,4 @@
-package com.icbc.dubbo.router;
+package com.icbc.wfs;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,9 +12,12 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.config.ServiceConfig;
+import com.icbc.dubbo.router.HashRouter;
+import com.icbc.dubbo.router.HashRouterFlag;
+import com.icbc.dubbo.router.WfsRouter;
+import com.icbc.dubbo.router.WfsRouterFlag;
 import com.icbc.dubbo.util.SpringContextHolder;
 import com.icbc.dubbo.zk.ZKRegistryClient;
-import com.icbc.wfs.WfsRestorer;
 
 /**
  * 路由初始化

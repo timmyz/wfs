@@ -26,12 +26,13 @@
 	<dubbo:reference id="wfsGet" interface="com.icbc.wfs.service.WfsGet" group="*" scope="remote" />
 	<dubbo:reference id="wfsEdit" interface="com.icbc.wfs.service.WfsEdit" group="*" scope="remote" merger="boolean" />
 	 
-	<bean id="springContextHolder" class="com.icbc.dubbo.util.SpringContextHolder"></bean>
+	<bean id="springContextHolder" class="com.icbc.dubbo.util.SpringContextHolder" />
+	
 	<bean id="propertyConfigurer" class="com.icbc.dubbo.util.PropertyConfigurer">
 	    <property name="location" value="classpath:application.properties" />  
 	</bean>
 	
-	<bean id="routerInitializer" class="com.icbc.dubbo.router.RouterInitializer">
+	<bean id="routerInitializer" class="com.icbc.wfs.RouterInitializer">
 		<property name="registryClient" ref="registryClient" />
 	</bean>
 	<bean id="registryClient" class="com.icbc.dubbo.zk.ZKRegistryClient">
