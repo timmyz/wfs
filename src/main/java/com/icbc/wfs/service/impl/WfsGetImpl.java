@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.icbc.dubbo.router.WfsRouter;
+import com.icbc.dubbo.router.HashRouter;
 import com.icbc.wfs.WfsEnv;
 import com.icbc.wfs.WfsRestorer;
 import com.icbc.wfs.WfsUtil;
@@ -49,9 +49,9 @@ public class WfsGetImpl implements WfsGet {
             }
             return getPhy0(WfsUtil.getPhyFile(path));
         } catch (FileNotFoundException e) {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             flag = flag.concat(WfsEnv.GROUP_FLAG);
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, flag);
             try {
                 return wfsGet.get(path, flag);
             } catch (NoSuchElementException e1) {
@@ -78,9 +78,9 @@ public class WfsGetImpl implements WfsGet {
             }
             return fileList;
         } else {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             flag = flag.concat(WfsEnv.GROUP_FLAG);
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, flag);
             try {
                 return wfsGet.getList(path, flag);
             } catch (NoSuchElementException e1) {
@@ -97,9 +97,9 @@ public class WfsGetImpl implements WfsGet {
             }
             return getPhy0(new File(WfsUtil.getPhyFilePathByHash(path)));
         } catch (FileNotFoundException e) {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             flag = flag.concat(WfsEnv.GROUP_FLAG);
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, flag);
             try {
                 return wfsGet.getPhy(path, flag);
             } catch (NoSuchElementException e1) {
@@ -142,9 +142,9 @@ public class WfsGetImpl implements WfsGet {
             }
             return fileList;
         } else {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             flag = flag.concat(WfsEnv.GROUP_FLAG);
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, flag);
             try {
                 return wfsGet.getPhyList(path, flag);
             } catch (NoSuchElementException e1) {

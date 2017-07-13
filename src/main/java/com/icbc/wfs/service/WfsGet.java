@@ -16,4 +16,5 @@ public interface WfsGet {
     InputStream getPhy(String path, String flag);
 
     List<String> getPhyList(String path, String flag);
+    
 }

@@ -13,11 +13,11 @@ public class WfsIOTest {
 
     // TODO Auto-generated method stub
     // public static final String inputPath = "/Users/timmyzhang/Downloads/Dash.zip";
-    public static final String inputPath = "B:\\Temp\\NOTES_9.0.1_MAC_64B_ZHCN_ZHTW.dmg";
+    public static final String inputPath = "B:\\Temp\\Chrysanthemum.jpg";
     // public static final String inputPath = "";
 
     // public static final String outputPath = "/Users/timmyzhang/temp/output/Dash.zip";
-    public static final String outputPath = "B:\\NOTES_9.0.1_MAC_64B_ZHCN_ZHTW.dmg";
+    public static final String outputPath = "B:\\Chrysanthemum.jpg";
     // public static final String outputPath = "";
 
     public static void main(String[] args) throws Exception {
@@ -67,11 +67,13 @@ public class WfsIOTest {
                                 getIn.close();
                             }
                         }
+                        /*
                         if (wfsIO.del(path)) {
                             System.out.println("del  done");
                         } else {
                             System.out.println("del  oops");
                         }
+                        */
                     } else {
                         System.out.println("put oops~");
                     }

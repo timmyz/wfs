@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.icbc.dubbo.router.WfsRouter;
+import com.icbc.dubbo.router.HashRouter;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
 import com.icbc.wfs.service.WfsGet;
@@ -53,7 +53,7 @@ public class WfsIOImpl implements WfsIO {
         }
 
         if (!WfsUtil.isDirectory(path)) {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             if (!wfsPut.put(path, "", in)) {
                 logger.error("put-->false");
                 throw new RuntimeException("存放失败[1]");
@@ -79,7 +79,7 @@ public class WfsIOImpl implements WfsIO {
             throw new RuntimeException("虚拟路径为空");
         }
 
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
         InputStream in;
         try {
             in = wfsGet.get(path, "");
@@ -129,7 +129,6 @@ public class WfsIOImpl implements WfsIO {
      */
     @Override
     public boolean del(String path) {
-
         // 虚拟路径为空
         if (WfsUtil.isEmptyString(path)) {
             throw new RuntimeException("虚拟路径为空");
@@ -140,23 +139,19 @@ public class WfsIOImpl implements WfsIO {
             throw new RuntimeException("虚拟路径为目录");
         }
 
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
         String directory = WfsUtil.getParent(path);
         String fileName = WfsUtil.getFileName(path);
 
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
-
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, directory);
         if (!WfsUtil.mergerFalse(wfsEdit.delDir(directory, fileName))) {
             throw new RuntimeException("删除失败[1]");
         }
 
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
-
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
         if (!WfsUtil.mergerFalse(wfsEdit.del(path))) {
             throw new RuntimeException("删除失败[2]");
         }
-
         return true;
     }
 
@@ -168,17 +163,15 @@ public class WfsIOImpl implements WfsIO {
      */
     @Override
     public List<String> list(String path) {
-
         // 虚拟路径为空
         if (WfsUtil.isEmptyString(path)) {
             throw new RuntimeException("虚拟路径为空");
         }
-
         List<String> list = new LinkedList<String>();
         if (!WfsUtil.isDirectory(path)) {
             list.add(WfsUtil.getFileName(path));
         } else {
-            RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+            RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
             try {
                 list = wfsGet.getList(path, "");
             } catch (FileNotFoundException e) {

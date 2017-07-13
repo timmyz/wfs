@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -25,9 +23,7 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.icbc.dubbo.common.URLTimestampComparator;
 
 public class ZKRegistryClient implements InitializingBean {
 
@@ -126,44 +122,6 @@ public class ZKRegistryClient implements InitializingBean {
             LOGGER.warn(e);
         } catch (InterruptedException e) {
             LOGGER.warn(e);
-        }
-    }
-
-    public void addOverrideParameters(String serviceInterface, String version, String group,
-            Map<String, String> params) {
-        if (params == null || params.isEmpty()) {
-            return;
-        }
-
-        String parentPath =
-                getParentPath(Constants.CONFIGURATORS_CATEGORY, serviceInterface, version);
-        List<URL> children = getChildren(parentPath, group);
-        URL oldUrl = null;
-        URL newUrl = null;
-        if (!children.isEmpty()) {
-            Collections.sort(children, new URLTimestampComparator(false));
-            for (URL childUrl : children) {
-                if (StringUtils.isEquals(group, childUrl.getParameter(Constants.GROUP_KEY))) {
-                    oldUrl = childUrl;
-                    break;
-                }
-            }
-            newUrl = oldUrl;
-        }
-        if (newUrl == null) {
-            newUrl = URL.valueOf("override://0.0.0.0/" + serviceInterface);
-            if (group != null) {
-                newUrl = newUrl.addParameter(Constants.GROUP_KEY, group);
-            }
-        }
-        newUrl = newUrl.addParameter(Constants.TIMESTAMP_KEY, System.currentTimeMillis());
-        for (Entry<String, String> entry : params.entrySet()) {
-            newUrl = newUrl.addParameter(entry.getKey(), entry.getValue());
-        }
-
-        create(parentPath + "/" + URL.encode(newUrl.toString()), true);
-        if (null != oldUrl) {
-            delete(parentPath + "/" + URL.encode(oldUrl.toString()));
         }
     }
 

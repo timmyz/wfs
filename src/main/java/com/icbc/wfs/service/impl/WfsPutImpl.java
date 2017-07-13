@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.icbc.dubbo.router.WfsRouter;
+import com.icbc.dubbo.router.HashRouter;
 import com.icbc.wfs.WfsEnv;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsPut;
@@ -27,18 +27,15 @@ public class WfsPutImpl implements WfsPut {
     private WfsPut wfsPut;
 
     public boolean put(String path, String flag, InputStream in) {
-
         File phyFile = WfsUtil.getPhyFile(path);
-
         if (!WfsUtil.putPhy(in, phyFile)) {
             return false;
         }
-
         boolean ret = false;
         BufferedInputStream nextIn = null;
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, path);
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, path);
         flag = flag.concat(WfsEnv.GROUP_FLAG);
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_FLAG, flag);
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_FLAG, flag);
         try {
             nextIn = new BufferedInputStream(new FileInputStream(phyFile));
             ret = wfsPut.put(path, flag, nextIn);

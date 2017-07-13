@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.icbc.dubbo.router.WfsRouter;
+import com.icbc.dubbo.router.HashRouter;
 import com.icbc.wfs.WfsUtil;
 import com.icbc.wfs.service.WfsEdit;
 
@@ -25,7 +25,7 @@ public class WfsEditImpl implements WfsEdit {
     public boolean[] del(String path) {
         File phyFile = WfsUtil.getPhyFile(path);
         if (phyFile.exists()) {
-        	logger.debug("phyFile exists");
+            logger.debug("phyFile exists");
             if (!phyFile.delete()) {
                 logger.error("del--> delete" + phyFile.getName());
                 return new boolean[] {false};
@@ -36,7 +36,7 @@ public class WfsEditImpl implements WfsEdit {
 
     public boolean[] put0(String path) {
         String directory = WfsUtil.getParent(path);
-        RpcContext.getContext().setAttachment(WfsRouter.ROUTE_KEY, directory);
+        RpcContext.getContext().setAttachment(HashRouter.ROUTE_KEY, directory);
         String fileName = WfsUtil.getFileName(path);
         return wfsEdit.put(directory, fileName);
     }
@@ -51,14 +51,14 @@ public class WfsEditImpl implements WfsEdit {
         if (!vFolder.exists()) {
             // 如果虚拟路径不等于根路径，则递归创建上级目录
             if (!WfsUtil.ROOT.equals(dir)) {
-            	logger.debug("ROOT not equals dir");
+                logger.debug("ROOT not equals dir");
                 if (!WfsUtil.mergerFalse(put0(dir))) {
                     logger.error("put--> put0");
                     return new boolean[] {false};
                 }
             }
-            if(!vFolder.mkdirs()){
-            	logger.error("failed to mkdirs");
+            if (!vFolder.mkdirs()) {
+                logger.error("put->failed to mkdirs " + vFolder.getPath());
             }
         }
         // 创建假文件，HASH路径+真文件名
@@ -89,7 +89,7 @@ public class WfsEditImpl implements WfsEdit {
         if (dirPhyFile.exists() && dirPhyFile.isDirectory()) {
             File phyFile = new File(dirPhyFile.getAbsolutePath() + File.separator + fileName);
             if (phyFile.exists()) {
-            	logger.debug("phyFile exists");
+                logger.debug("phyFile exists");
                 if (!phyFile.delete()) {
                     logger.error("del-->delete" + phyFile.getName());
                     return new boolean[] {false};
