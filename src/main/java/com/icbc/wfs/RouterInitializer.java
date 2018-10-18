@@ -1,5 +1,6 @@
 package com.icbc.wfs;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
 import com.icbc.dubbo.router.HashRouter;
 import com.icbc.dubbo.router.HashRouterFlag;
@@ -26,11 +28,16 @@ import com.icbc.dubbo.zk.ZKRegistryClient;
 public class RouterInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RouterInitializer.class);
-    private ZKRegistryClient registryClient;
+    private RegistryConfig registry;
+    private ZKRegistryClient registryClient = new ZKRegistryClient();
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent arg0) {
-
+        try {
+            registryClient.connect(registry.getAddress());
+        } catch (IOException e) {
+            return;
+        }
         Map<String, ServiceConfig<?>> serviceConfigs = (Map) SpringContextHolder
                 .getApplicationContext().getBeansOfType(ServiceConfig.class);
         for (ServiceConfig<?> serviceConfig : serviceConfigs.values()) {
@@ -39,6 +46,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
                 doRouter(serviceConfig, HashRouter.NAME);
             }
         }
+        registryClient.close();
         new Thread(new WfsRestorer()).start();
     }
 
@@ -47,8 +55,8 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
             String version = serviceConfig.getVersion();
             String interfaze = serviceConfig.getInterface();
             String path = "/dubbo/" + interfaze + "/" + Constants.ROUTERS_CATEGORY;
-            List<URL> routers = registryClient.getChildren(Constants.ROUTERS_CATEGORY, interfaze,
-                    version, null);
+            List<URL> routers =
+                    registryClient.getChildren(Constants.ROUTERS_CATEGORY, interfaze, version);
 
             boolean contain = false;
             for (URL oriRouter : routers) {
@@ -95,11 +103,7 @@ public class RouterInitializer implements ApplicationListener<ContextRefreshedEv
         }
     }
 
-    public void setRegistryClient(ZKRegistryClient registryClient) {
-        this.registryClient = registryClient;
-    }
-
-    public ZKRegistryClient getRegistryClient() {
-        return this.registryClient;
+    public void setRegistry(RegistryConfig registry) {
+        this.registry = registry;
     }
 }

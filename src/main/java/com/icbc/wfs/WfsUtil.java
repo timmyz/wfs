@@ -123,8 +123,7 @@ public class WfsUtil {
     }
 
     public static String getPhyFilePath(String path) {
-        String hash = MurMurHash.hashRange(path);
-        return getPhyFilePathByHash(hash);
+        return getPhyFilePathByHash(MurMurHash.hashHex(path));
     }
 
     public static String getPhyFilePathByHash(String hash) {

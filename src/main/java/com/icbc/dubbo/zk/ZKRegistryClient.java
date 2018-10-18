@@ -8,7 +8,6 @@ package com.icbc.dubbo.zk;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.zookeeper.CreateMode;
@@ -17,30 +16,18 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
-import org.springframework.beans.factory.InitializingBean;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.config.RegistryConfig;
 
-public class ZKRegistryClient implements InitializingBean {
+public class ZKRegistryClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZKRegistryClient.class);
-
-    private RegistryConfig registryConfig;
     private ZooKeeper zk;
 
     public ZKRegistryClient() {}
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (registryConfig == null) {
-            throw new IllegalArgumentException("Property registryConfig can not be empty.");
-        }
-        connect(registryConfig.getAddress());
-    }
 
     public void connect(String address) throws IOException {
         zk = new ZooKeeper(address, 600000, new Watcher() {
@@ -60,10 +47,12 @@ public class ZKRegistryClient implements InitializingBean {
         }
     }
 
-    public List<URL> getChildren(String parent, String group) {
+    public List<URL> getChildren(String category, String serviceInterface, String version) {
         List<String> paths;
         try {
-            paths = zk.getChildren(parent, false);
+            paths = zk.getChildren(Constants.PATH_SEPARATOR + Constants.DEFAULT_DIRECTORY
+                    + Constants.PATH_SEPARATOR + serviceInterface + Constants.PATH_SEPARATOR
+                    + category, false);
         } catch (KeeperException e) {
             return Collections.emptyList();
         } catch (InterruptedException e) {
@@ -74,27 +63,7 @@ public class ZKRegistryClient implements InitializingBean {
         for (String path : paths) {
             urls.add(URL.valueOf(URL.decode(path)));
         }
-        if (group != null && group.length() > 0) {
-            Iterator<URL> it = urls.iterator();
-            while (it.hasNext()) {
-                if (!group.equals(it.next().getParameter(Constants.GROUP_KEY))) {
-                    it.remove();
-                }
-            }
-        }
         return urls;
-    }
-
-    public List<URL> getChildren(String category, String serviceInterface, String version,
-            String group) {
-        String parent = getParentPath(category, serviceInterface, version);
-        List<URL> urls = getChildren(parent, group);
-        return urls;
-    }
-
-    public List<URL> getChildren(String category, URL url) {
-        return getChildren(category, url.getParameter(Constants.INTERFACE_KEY),
-                url.getParameter(Constants.VERSION_KEY), url.getParameter(Constants.GROUP_KEY));
     }
 
     public void delete(String path) {
@@ -108,10 +77,7 @@ public class ZKRegistryClient implements InitializingBean {
     }
 
     public void create(String path, boolean persistent) {
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        int i = path.lastIndexOf('/');
+        int i = path.lastIndexOf(Constants.PATH_SEPARATOR);
         if (i > 0) {
             create(path.substring(0, i), persistent);
         }
@@ -124,18 +90,5 @@ public class ZKRegistryClient implements InitializingBean {
             LOGGER.warn(e);
         }
     }
-
-    private String getParentPath(String category, String serviceInterface, String version) {
-    	LOGGER.debug(version);
-        return "/dubbo/" + serviceInterface + "/" + category;
-    }
-
-
-    public void setRegistryConfig(RegistryConfig registryConfig) {
-        this.registryConfig = registryConfig;
-    }
+    
 }
-
-/*
- * 修改历史 $Log: ,v $
- */

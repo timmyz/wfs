@@ -6,7 +6,7 @@ import java.nio.ByteOrder;
 
 public class MurMurHash {
 
-    public static String hashRange(String key) {
+    public static String hashHex(String key) {
         return null == key ? ""
                 : String.format("%16s", Long.toString(hash(key), 16).substring(1)).replace(' ',
                         '0');
@@ -14,33 +14,50 @@ public class MurMurHash {
 
     public static long hash(String key) {
         try {
-            long hashValue = hash(key.getBytes("UTF-8"));
-            return hashValue < 0L ? hashValue : hashValue + Long.MIN_VALUE;
+            return hash(key.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            throw new NullPointerException(key);
+            throw new RuntimeException("UnsupportedEncodingException:" + key);
         }
     }
 
-    public static boolean withInRange(String[] group, long hashValue, String routeFlag,
+    public static long hash(byte[] key) {
+        long hashValue = hash0(key);
+        return hashValue < 0L ? hashValue : hashValue + Long.MIN_VALUE;
+    }
+
+    public static boolean withInRange(String[] groups, long hashValue, String routeFlag,
             boolean flag) {
-        int l = group.length;
-        String groupFlag = group[--l];
-        if (null != routeFlag && flag ^ routeFlag.contains(groupFlag)) {
+        int l = groups.length;
+        char groupFlag = groups[--l].charAt(0);
+        if (null != routeFlag && flag ^ -1 < routeFlag.indexOf(groupFlag)) {
             return false;
         }
         while (1 < l) {
-            if (withInRange(hashValue, group[--l], group[--l])) {
+            if (withInRange(hashValue, groups[--l], groups[--l])) {
                 return true;
             }
         }
         return false;
     }
 
+    public static boolean withInRange(String group, long hashValue, String routeFlag,
+            boolean flag) {
+        return withInRange(group.split("-"), hashValue, routeFlag, flag);
+    }
+
     public static boolean withInRange(long hashValue, String begin, String end) {
         return hashValue >= nParseLong(begin) && hashValue < nParseLong(end);
     }
 
-    private static long hash(byte[] key) {
+    public static boolean withInRange(String beginA, String endA, String beginB, String endB) {
+        long bA = nParseLong(beginA);
+        long bB = nParseLong(beginB);
+        long eA = nParseLong(endA);
+        long eB = nParseLong(endB);
+        return (bA < bB ? bB : bA) < (eA < eB ? eA : eB);
+    }
+
+    private static long hash0(byte[] key) {
 
         ByteBuffer buf = ByteBuffer.wrap(key);
         int seed = 0x1234ABCD;

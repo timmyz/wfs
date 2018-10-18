@@ -33,10 +33,7 @@
 	</bean>
 	
 	<bean id="routerInitializer" class="com.icbc.wfs.RouterInitializer">
-		<property name="registryClient" ref="registryClient" />
-	</bean>
-	<bean id="registryClient" class="com.icbc.dubbo.zk.ZKRegistryClient">
-		<property name="registryConfig" ref="dubboregistry1" />
+		<property name="registry" ref="dubboregistry1" />
 	</bean>
 	
 </beans>
